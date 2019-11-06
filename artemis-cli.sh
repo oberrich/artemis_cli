@@ -55,7 +55,6 @@ fi
 due_date=$(python3 detail/artemis-cli.py deadline $course_id $1 $username $password)
 
 if [[ $? -ne 0 ]]; then
-  #echo "Failed to get due date for exercise. Check shortName of exercise in artemis when in doubt."
   exit 1
 else
   echo "Checking out 'master@{deadline="$due_date"}'"
