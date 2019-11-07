@@ -42,12 +42,12 @@ declare -a students=(
   # You can insert TUM IDs here or pass them seperated with spaces via the command line (commas are removed)
 )
 
-if [[ !($# > 0) ]]; then
+if [[ ! ($# -gt 0) ]]; then
   echo 'Usage: ./artemis-cli.sh assignment [tum_id1, ..., tum_idN] (e.g.: ./artemis-cli.sh w01h01 ge36moy, ge37moy, ge38moy)'
   exit 1
 fi
 
-if [[ $course_name -eq 'pgdp1920' && !($1 =~ ^w[0-9]+[hp][0-9]+$) ]]; then
+if [[ $course_name -eq 'pgdp1920' && ! ($1 =~ ^w[0-9]+[hp][0-9]+$) ]]; then
   echo 'Assignment names in the PGdP course have to match w[0-9]+[hp][0-9]+'
   exit 1
 fi
