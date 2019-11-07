@@ -1,0 +1,8 @@
+# Individual PyCharm settings
+*.idea
+
+# Virtual environments
+/venv
+
+# SWaP files 
+*swp
