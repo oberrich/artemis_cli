@@ -5,7 +5,7 @@ Used for the introductory course "Praktikum Grundlagen der Programmierung" [IN00
 ## How to use
 1. Open `artemis-cli.sh` and enter your ArTEMiS username and password into the script (to be changed)
 2. Make `artemis-cli.sh` executable with `chmod +x artemis-cli.sh`
-3. Run the script with `./artemis-cli.sh` and follow its prompts
+3. Run the script with `./artemis-cli.sh assignment [tum_id1, ..., tum_idN] (e.g.: ./artemis-cli.sh w01h01 ge36moy, ge37moy, ge38moy)'`
 
 ## Supported functionalities (continuously updated)
 1. Downloading all student repos
