@@ -31,8 +31,12 @@ password="" # Your artemis password
 #//////////////////////////////////////
 #//////////////////////////////////////
 
+. artemis-credentials.config
+username=$username
+password=$password
+
 if [ -z "${username}" ] || [ -z "${password}" ]; then
-  echo 'Enter your Artemis username and password into the script'
+  echo 'Artemis credentials needed: Enter your username and password into `artemis-credentials.config or add them to the script'
   exit 1
 fi
 
