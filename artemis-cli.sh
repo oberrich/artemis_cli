@@ -43,7 +43,7 @@ declare -a students=(
 )
 
 if [[ !($# > 0) ]]; then
-  echo 'Usage: ./repos.sh assignment [tum_id1, ..., tum_idN] (e.g.: ./repos w01h01 ge36moy, ge37moy, ge38moy)'
+  echo 'Usage: ./artemis-cli.sh assignment [tum_id1, ..., tum_idN] (e.g.: ./artemis-cli.sh w01h01 ge36moy, ge37moy, ge38moy)'
   exit 1
 fi
 
