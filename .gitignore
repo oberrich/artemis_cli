@@ -5,4 +5,7 @@
 /venv
 
 # SWaP files 
-*swp
+*.swp
+
+# credentials file
+artemis-credentials.config
