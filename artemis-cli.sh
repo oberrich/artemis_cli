@@ -8,35 +8,21 @@
 #   ./grade w02h03 
 #   ./grades scores
 
-# contact
-#   obermari PLUS pgdp AT cs DOT tum DOT edu
-#   @ge36moy
-
-#//////////////////////////////////////
-#///////* CONFIGURATE HERE *///////////
-#//////////////////////////////////////
-
 # For a more pleasant experience save credentials by enabling the credentials storage in git
 # $ git config --global credential.helper store
 
-# Course settings
-bitbucket='bitbucket.ase.in.tum.de'
-course_name='pgdp1920'
-course_id=37
+# Import settings
+. artemis-cli.config
 
-# Don't redistribute without removing your credentials!
-username="" # Your artemis username
-password="" # Your artemis password
+bitbucket=$bitbucket
+course_name=$course_name
+course_id=$course_id
 
-#//////////////////////////////////////
-#//////////////////////////////////////
-
-. artemis-credentials.config
 username=$username
 password=$password
 
 if [ -z "${username}" ] || [ -z "${password}" ]; then
-  echo 'Artemis credentials needed: Enter your username and password into `artemis-credentials.config or add them to the script'
+  echo 'Artemis credentials needed: Enter your username and password into `artemis-cli.config`'
   exit 1
 fi
 
@@ -56,7 +42,7 @@ if [[ $course_name -eq 'pgdp1920' && ! ($1 =~ ^w[0-9]+[hp][0-9]+$) ]]; then
   exit 1
 fi
 
-due_date=$(python3 detail/artemis_cli.py deadline $course_id $1 $username $password)
+due_date=$(detail/artemis_cli.py deadline $course_id $1 $username $password)
 
 if [[ $? -ne 0 ]]; then
   exit 1
