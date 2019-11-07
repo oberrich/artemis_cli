@@ -63,13 +63,13 @@ if [[ $? -ne 0 ]]; then
 fi
 
 touch scores
-echo -e "#exercise:\"$1\"\n" > scores
+printf "#exercise:\"$1\"\n" > scores
 
 cwd=$(pwd)
 
 for i in "${students[@]}"
 do
-  echo -e "Fetching $i... \c"
+  printf "Fetching $i... \c"
 
   repo_local="$i"
   repo_remote="$course_name$1-$i"
@@ -88,13 +88,11 @@ do
     cd "$repo_local"
 
     if [[ $? -eq 0 ]]; then
-      printf "\x1B[92mok.\e[39m\n"
+      printf "\e[92mok.\e[39m\n"
     else
       printf "\e[91mfailed.\e[39m\n"
       continue
     fi
-
-    git log --sparse --full-history --all --pretty=format:"%an <%ae> %s%n%cn <%ce> %s" | grep -Ev '^(ArTEMiS <krusche\+artemis@in.tum.de|Erik Kynast <kynast@in.tum.de>|root <root@vmbruegge[0-9]*.informatik.tu-muenchen.de>)' > gitlog_mails
 
     if [ "$i" != "exercise" ] && [ "$i" != "solution" ] && [ "$i" != "tests" ]; then
       git checkout `git rev-list -1 --before="$due_date" master`
