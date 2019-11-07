@@ -13,9 +13,9 @@ exercises in order to grade them. **This script assists the relevant steps in th
 1. Add your ArTEMiS credentials (username and password) into `artemis-credentials.config`
    * Remember to untrack the changes to this file before redistributing: `git update-index --assume-unchanged artemis-credentials.config`
 2. Make `artemis-cli.sh` executable: `chmod +x artemis-cli.sh`
-3. Run the script with arguments 
+3. Run the script: `./artemis-cli.sh  w01h01 ge36moy, ge37moy, ge38moy` with arguments being
    1. assignment (e.g. `w01h01`)
-   2. comma separated TUM ids (e.g. `ge36moy, ge37moy, ge38moy`)
+   2. comma separated TUM ids (e.g. ``ge36moy, ge37moy, ge38moy``)
 
 ## Supported functionalities (continuously updated)
 1. Downloading all student repos
