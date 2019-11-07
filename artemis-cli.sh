@@ -52,7 +52,7 @@ if [[ $course_name -eq 'pgdp1920' && !($1 =~ ^w[0-9]+[hp][0-9]+$) ]]; then
   exit 1
 fi
 
-due_date=$(python3 detail/artemis-cli.py deadline $course_id $1 $username $password)
+due_date=$(python3 detail/artemis_cli.py deadline $course_id $1 $username $password)
 
 if [[ $? -ne 0 ]]; then
   exit 1
