@@ -59,7 +59,7 @@ mkdir -p $1
 cd $1
 
 if [[ $? -ne 0 ]]; then
-  echo -e "\e[91mFailed to create parent folder, check your permissions.\e[39m"
+  printf "\e[91mFailed to create parent folder, check your permissions.\e[39m"
 fi
 
 touch scores
@@ -81,16 +81,16 @@ do
     cd "$cwd"
 
     if ! git -C "$repo_local" pull --quiet && ! git clone --quiet "$repo_url" "$repo_local"; then
-      echo -e "\e[91mfailed (1).\e[39m"
+      printf "\e[91mfailed (1).\e[39m\n"
       continue
     fi
 
     cd "$repo_local"
 
     if [[ $? -eq 0 ]]; then
-      echo -e "\e[92mok.\e[39m"
+      printf "\x1B[92mok.\e[39m\n"
     else
-      echo -e "\e[91mfailed.\e[39m"
+      printf "\e[91mfailed.\e[39m\n"
       continue
     fi
 
