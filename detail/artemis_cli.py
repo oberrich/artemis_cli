@@ -7,11 +7,11 @@ if len(sys.argv) != 6:
   raise helper
   
 sysargs = {
-  "action" = sys.argv[1]
-  "course_id" = sys.argv[2]
-  "exercise" = sys.argv[3]
-  "username" = sys.argv[4]
-  "password" = sys.argv[5]
+  "action": sys.argv[1],
+  "course_id": sys.argv[2],
+  "exercise": sys.argv[3],
+  "username": sys.argv[4],
+  "password": sys.argv[5]
 }
 
 action = sysargs["action"]
@@ -76,7 +76,7 @@ headers['Authorization'] = f'Bearer {token}'
 
 action_dispatch = {
   "deadline"  : action_deadline,
-  "getscores" : action_get_scores
+  "getscores" : action_get_scores,
   "postscores": action_post_scores
 }
 
