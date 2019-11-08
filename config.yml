@@ -1,0 +1,13 @@
+bitbucket:
+  base_url: 'https://bitbucket.ase.in.tum.de'
+
+artemis:
+  base_url: 'https://artemis.ase.in.tum.de/api'
+
+  credentials:
+    username: 'ge36moy'
+    password: 's3cur3_l337sp33k_p4zzw0rd'
+  
+  course:
+    id: 37
+    name: 'pgdp1920'

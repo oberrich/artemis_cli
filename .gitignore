@@ -12,3 +12,6 @@ artemis-cli.config
 
 # Exercises subfolders
 /w[0-9]*h[0-9]*
+
+# Exclude python cache folder
+/__pycache__
