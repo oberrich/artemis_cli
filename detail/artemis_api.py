@@ -5,10 +5,18 @@ class ArtemisAPI:
 
   def __init__(self, cfg):
     self.base_url = cfg['base_url']
-    self.course = cfg['course']
-    self.creds = cfg['credentials']
+    self.course   = cfg['course']
+    self.creds    = cfg['credentials'];
 
+    # make sure credentials were set
+    if not creds['username'] or \
+       not creds['password'] or \
+           creds['password'] == 's3cur3_l337sp33k_p4zzw0rd':
+      raise RuntimeError('Artemis credentials required: Enter your username and password into `config.yml`')
+
+    # create session and set headers and cookies
     s = requests.Session()
+
     s.headers.update({
       'User-Agent': "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0",
       'X-XSRF-TOKEN': "2d141b5-9e1c-4390-ae06-5143753b4459",
@@ -22,7 +30,7 @@ class ArtemisAPI:
       'XSRF-TOKEN': "2d141b5-9e1c-4390-ae06-5143753b4459"
     })
 
-    # call raise_for_status() for every response
+    # setup a hook that calls raise_for_status() on every response
     s.hooks = {
       'response': lambda r, *args, **kwargs: r.raise_for_status()
     }
