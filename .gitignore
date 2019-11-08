@@ -16,3 +16,5 @@ artemis-credentials.config
 w[0-9]*h[0-9]*/
 
 # Exclude python cache folder
+__pycache__/
+*.pyc
