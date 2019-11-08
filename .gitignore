@@ -8,7 +8,7 @@
 *.swp
 
 # Configuration file
-artemis-cli.config
+config.yml
 
 # Exercises subfolders
 /w[0-9]*h[0-9]*
