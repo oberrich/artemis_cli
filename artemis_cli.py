@@ -10,9 +10,20 @@ from detail.artemis_api import ArtemisAPI
 
 parser = argparse.ArgumentParser(description='A command-line application for tutors to more productively grade programming excises on ArTEMiS')
 # TODO: think of and parse arguments
-parser.add_argument('command', help='The command for the script. Valid commands are "downloadrepos", "getscores", "newresult".')
-parser.add_argument('-s', '--students', metavar='', nargs='+', help='The students TUM ids to be processed (e.g. ge36feg ba12sup, ...)')
-parser.add_argument('-a', '--assignment', metavar='', nargs=1, help='The assignment to be processed (e.g. w01h01)')
+parser.add_argument('command',
+                    help='The command for the script. Valid commands are "downloadrepos", "getscores", "newresult".')
+parser.add_argument('-s',
+                    '--students',
+                    metavar='',
+                    nargs='+',
+                    help='The students TUM ids to be processed (e.g. ge36feg ba12sup, ...)')
+parser.add_argument('-a',
+                    '--assignment',
+                    metavar='',
+                    nargs=1,
+                    help='The assignment to be processed (e.g. w01h01)')
+
+
 
 group = parser.add_mutually_exclusive_group()
 group.add_argument('-q', '--quiet', action='store_true', help='Print quiet')
@@ -34,25 +45,38 @@ def download_repos():
     # students.extend(['exercise', 'solution', 'tests'])
     assignment = args.assignment[0]
     for student in students:
-        # mkdir
-        # cd (if not there raise 'Failed to create parent folder, check your permissions.'
-        # da rein klonen
 
-        # example repo: https://bitbucket.ase.in.tum.de/scm/PGDP1920W01P01/pgdp1920w01p01-ge36zuv.git
-        print('Cloning repo of assigment %s for %s' % (assignment, student))
+        # example repo_url: https://bitbucket.ase.in.tum.de/scm/PGDP1920W01P01/pgdp1920w01p01-ge42abc.git
+        print('Fetching assigment %s for %s...' % (assignment, student))
 
         course_assignment = course_name + assignment
-        repo_remote = course_name + "-" + student
-        os.mkdir(course_assignment)
-        os.chdir(course_assignment)
+        remote_repo = course_name + '-' + student + '.git'
 
-        repo_url = os.path.join(bitbucket, 'scm', course_assignment, repo_remote + '.git')
-        os.system(('git clone ' + repo_url))
+        local_repo = os.path.join('..', course_assignment + '-' + student)
+
+        if not os.path.exists(local_repo):
+            os.mkdir(local_repo)
+        os.chdir(local_repo)
+
+        repo_url = os.path.join(bitbucket, 'scm', course_assignment, remote_repo)
+        clone = 'git clone ' + repo_url
+        # print(clone)
+        os.system(clone)
+
+
+def get_scores():
+    raise NotImplementedError
+
+
+def new_result():
+    raise NotImplementedError
 
 
 if __name__ == '__main__':
     command_dispatch = {
-        'downloadrepos': download_repos
+        'downloadrepos': download_repos,
+        'getscores': get_scores,
+        'newresult': new_result,
     }
 
     command_dispatch[args.command]()
