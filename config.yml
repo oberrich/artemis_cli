@@ -6,7 +6,7 @@ artemis:
 
   credentials:
     username: 'ge36moy'
-    password: 's3cur3_l337sp33k_p4zzw0rd'
+    password: ''
   
   course:
     id: 37

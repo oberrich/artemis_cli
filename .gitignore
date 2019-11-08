@@ -2,7 +2,7 @@
 *.idea
 
 # Virtual environments
-/venv
+venv/
 
 # SWaP files 
 *.swp
@@ -13,7 +13,6 @@ artemis-cli.config
 artemis-credentials.config
 
 # Exercises subfolders
-/w[0-9]*h[0-9]*
+w[0-9]*h[0-9]*/
 
 # Exclude python cache folder
-/__pycache__
