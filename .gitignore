@@ -9,6 +9,8 @@
 
 # Configuration file
 config.yml
+artemis-cli.config
+artemis-credentials.config
 
 # Exercises subfolders
 /w[0-9]*h[0-9]*
