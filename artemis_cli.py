@@ -15,4 +15,9 @@ with open('config.yml', 'r') as config_file:
 
 api = ArtemisAPI(cfg['artemis'])
 
-# TODO implement API in detail/artemis_api.py
+# TODO finish implementing API in detail/artemis_api.py
+# TODO port backup/artemis-cli.sh to python
+# TODO create symlink to tests repository for every student's submission to
+#      make testing a lot easier
+# TODO add feature to upload grades
+#(TODO create an eclipse/intellij project containing all student's submissions)  
