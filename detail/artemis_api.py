@@ -5,14 +5,14 @@ import json
 class ArtemisAPI:
 
     def __init__(self, cfg):
-        self.base_url = cfg['base_url']
-        self.course = cfg['course']
-        self.creds = cfg['credentials']
+        self._base_url = cfg['base_url']
+        self._course = cfg['course']
+        self._creds = cfg['credentials']
 
         # make sure credentials were set
-        if not self.creds['username'] or \
-                not self.creds['password'] or \
-                self.creds['password'] == 's3cur3_l337sp33k_p4zzw0rd':
+        if not self._creds['username'] or \
+                not self._creds['password'] or \
+                self._creds['password'] == 's3cur3_l337sp33k_p4zzw0rd':
             raise RuntimeError('Artemis credentials required: Enter your username and password into `config.yml`')
 
         # create session and set headers and cookies
@@ -40,15 +40,15 @@ class ArtemisAPI:
         self.__authenticate()
 
     def __request_post(self, route, data):
-        return json.loads(self.session.post(self.base_url + route, data=json.dumps(data)).text)
+        return json.loads(self.session.post(self._base_url + route, data=json.dumps(data)).text)
 
     def __request_get(self, route):
-        return self.session.get(self.base_url + route)
+        return self.session.get(self._base_url + route)
 
     def __authenticate(self):
         payload = {
-            'username': self.creds['username'],
-            'password': self.creds['password'],
+            'username': self._creds['username'],
+            'password': self._creds['password'],
             'rememberMe': False
         }
 
@@ -58,6 +58,3 @@ class ArtemisAPI:
             raise RuntimeError('Failed to authenticate!\nExpected field \'id_token\' in\n  ' + str(resp))
 
         self.session.auth = ('Bearer', resp['id_token'])
-
-    def todo(self):
-        pass
