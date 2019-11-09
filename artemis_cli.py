@@ -33,12 +33,7 @@ def generate_gradebook(dir, students):
         print('Warning: gradebook already existed, delete the gradebook and run '
               'the repos command again if you want to generate a new gradebook.')
 
-    gradebook = {
-        'assignment': args.assignment,
-        'assessments': []
-    }
-
-    gradebook['assessments'] = list(map(lambda s: {
+    gradebook = {'assignment': args.assignment, 'assessments': list(map(lambda s: {
         'name': s,
         'score': 100,
         'text': '',
@@ -49,7 +44,7 @@ def generate_gradebook(dir, students):
             ['', ''],
             ['', '']
         ]
-    }, students))
+    }, students))}
 
     with open(filename, 'w') as file:
         yaml.dump(gradebook, file, encoding='utf-8')
