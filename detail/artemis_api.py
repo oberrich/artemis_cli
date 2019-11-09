@@ -1,17 +1,15 @@
 import requests
 import json
 
-from json import JSONEncoder  # somehow necessary
-
-class DictEncoder(JSONEncoder):
-    '''
-    wtf Python that I have to implement this myself
-    '''
+class Serializable:
     def default(self, o):
         return o.__dict__
 
+    def serialize(self):
+        return json.dumps(self, default=self.default, indent=2, separators=(',', ': '))
 
-class NewResultBody:
+
+class NewResultBody(Serializable):
     '''
     Artemis api new result schema:
       {
@@ -40,6 +38,7 @@ class NewResultBody:
         self.resultString = result_text
         self.successful = True if score == 100 else False
         self.feedbacks = [] # type: List[FeedbackBody]
+
         if positive_feedback_entries is not None:
             for pos_feedback in positive_feedback_entries:
                 pos_feedback_body = FeedbackBody(positive=True,
@@ -54,7 +53,7 @@ class NewResultBody:
                 self.feedbacks.append(neg_feedback_body)
 
 
-class FeedbackBody:
+class FeedbackBody(Serializable):
     def __init__(self, positive, text, detail_text):
         # type: (bool, str, str)
         self.credits = 0            # default
@@ -66,17 +65,24 @@ class FeedbackBody:
         self.positive = positive
 
 
-class ArtemisAPI:
+class LoginBody(Serializable):
+    def __init__(self, username, password):
+        # type: (str, str)
+        self.username = username
+        self.password = password
+        self.rememberMe = False
 
+
+class ArtemisAPI:
     def __init__(self, cfg):
         self._base_url = cfg['base_url']
-        self._course = cfg['course']
-        self._creds = cfg['credentials']
+        self._course   = cfg['course']
+        self._creds    = cfg['credentials']
 
         # make sure credentials were set
         if not self._creds['username'] or \
-                not self._creds['password'] or \
-                self._creds['password'] == 's3cur3_l337sp33k_p4zzw0rd':
+           not self._creds['password'] or \
+               self._creds['password'] == 's3cur3_l337sp33k_p4zzw0rd':
             raise RuntimeError('Artemis credentials required: Enter your username and password into `config.yml`')
 
         # create session and set headers and cookies
@@ -103,20 +109,21 @@ class ArtemisAPI:
         self.session = s
         self.__authenticate()
 
-    def __request_post(self, route, data):
-        return json.loads(self.session.post(self._base_url + route, data=json.dumps(data)).text)
+    def __post(self, route, body):
+        # type: (string, Serializable) -> Dict
+        return json.loads(self.session.post(self._base_url + route, data=body.serialize()).text)
 
-    def __request_get(self, route):
-        return self.session.get(self._base_url + route)
+    def __get(self, route):
+        # type: (string) -> Dict
+        return json.loads(self.session.get(self._base_url + route))
 
     def __authenticate(self):
-        payload = {
-            'username': self._creds['username'],
-            'password': self._creds['password'],
-            'rememberMe': False
-        }
+        body = LoginBody(
+            self._creds['username'],
+            self._creds['password']
+        )
 
-        resp = self.__request_post('/authenticate', payload)
+        resp = self.__post('/authenticate', body)
 
         if 'id_token' not in resp.keys():
             raise RuntimeError('Failed to authenticate!\nExpected field \'id_token\' in\n  ' + str(resp))
@@ -126,11 +133,7 @@ class ArtemisAPI:
     def post_new_result(self, new_result_body, assignment, student):
         # type: (NewResultBody, str, str)
 
-        data = json.dumps(new_result_body,
-                          cls=DictEncoder,
-                          indent=4,
-                          separators=(',', ': '))
-        print(data)
+        print(new_result_body.serialize())
 
         # TODO post result via Artemis api, use assignment and student vars if necessary
         # self.__request_post(route=?, data=data)
