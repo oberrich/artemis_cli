@@ -134,11 +134,13 @@ def command_new_result():
     args.positive = [] if args.positive is None else args.positive
     args.negative = [] if args.negative is None else args.negative
 
+    # ensures all feedbacks have at most one description
     any_invalid = lambda fs: any((len(f) != 1 and len(f) != 2) or not f[0] for f in fs)
 
     if any_invalid(args.positive) or any_invalid(args.negative):
         raise RuntimeError('Text for feedback is required (detail_text is optional, no extra arguments allowed)')
 
+    # map arguments to a well-formed dictionary
     dict_mapper = lambda f, positive: {
         'text': f[0],
         'detailText': '' if len(f) == 1 else f[1],
@@ -146,6 +148,7 @@ def command_new_result():
     }
 
     feedbacks = map(partial(dict_mapper, positive=True), args.positive)
+    # and combine positive and negative feedbacks
     feedbacks.extend([x for x in map(partial(dict_mapper, positive=False), args.negative)])
 
     print(feedbacks)
