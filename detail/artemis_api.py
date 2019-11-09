@@ -1,6 +1,61 @@
 import requests
 import json
 
+class NewResultBody:
+    '''
+    Artemis api new result schema:
+      {
+        "score" : 85,
+        "id": 191374,
+        "resultString": "Excellent!",
+        "successful": "false",
+        "feedbacks": [
+          {
+            "credits": 0,
+            "type": "MANUAL",
+            "text": "well done!",
+            "detailText" : "detailText",
+            "referenceId": null,
+            "referenceType": null,
+            "positive": "true"
+          }
+        ]
+      }
+    '''
+
+    def __init__(self,
+                 score: int,
+                 result_text: str,
+                 positive_feedback_entries: List[Dict[str, str]] = None,
+                 negative_feedback_entries: List[Dict[str, str]] = None):
+        self.score = score
+        self.id = 12345  # TODO get right new result(?) id
+        self.result_String = result_text
+        self.successful = True if score == 100 else False
+        self.feedbacks: List[FeedbackBody] = []
+        if positive_feedback_entries is not None:
+            for pos_feedback in positive_feedback_entries:
+                pos_feedback_body = FeedbackBody(positive=True,
+                                                 text=pos_feedback["text"],
+                                                 detail_text=pos_feedback["detail_text"])
+                self.feedbacks.append(pos_feedback_body)
+        if negative_feedback_entries is not None:
+            for neg_feedback in negative_feedback_entries:
+                neg_feedback_body = FeedbackBody(positive=False,
+                                                 text=neg_feedback["text"],
+                                                 detail_text=neg_feedback["detail_text"])
+                self.feedbacks.append(neg_feedback_body)
+
+
+class FeedbackBody:
+    def __init__(self, positive: bool, text: str, detail_text: str):
+        self.credits = 0            # default
+        self.type = 'MANUAL'        # default
+        self.text = text
+        self.referenceId = None     # default
+        self.referenceType = None   # default
+        self.positive = positive
+
 
 class ArtemisAPI:
 
