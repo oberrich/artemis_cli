@@ -127,7 +127,7 @@ def command_new_result():
         'positive': positive
     }
 
-    feedbacks = map(partial(dict_mapper, positive=True), args.positive)
+    feedbacks = list(map(partial(dict_mapper, positive=True), args.positive))
     # and combine positive and negative feedbacks
     feedbacks.extend([x for x in map(partial(dict_mapper, positive=False), args.negative)])
 
@@ -199,7 +199,7 @@ def main():
     # dispatch command
     dispatch = {
         'repos': command_repos,
-        'getscores': command_get_scores,
+        # 'getscores': command_get_scores,
         'newresult': command_new_result
     }
 

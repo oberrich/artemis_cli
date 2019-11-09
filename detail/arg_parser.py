@@ -30,6 +30,7 @@ class ArgParser(argparse.ArgumentParser):
 
         # scores
         # syntax: ./artemis_cli.py -a w01h01 -s ge42abc
+        """
         scores_parser = sub_parsers.add_parser('scores',
                                                help='Get scores for students\' assignments [not yet implemented]')
 
@@ -41,6 +42,7 @@ class ArgParser(argparse.ArgumentParser):
                                    metavar='tumId',
                                    nargs='+',
                                    help='The students TUM ids to be processed (e.g. ge36feg ba12sup, ...)')
+        """
 
         # newresult
         # syntax: ./artemis_cli.py -a w01h01 -s ab43cde
