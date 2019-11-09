@@ -35,31 +35,9 @@ def generate_gradebook(students):
 def command_repos():
     # TODO apply sanitization in main function
     assignment = args.assignment
-
-    if course_name == "pgdp1920":
-        regex = "^w[0-9][0-9]%s[hp][0-9][0-9]%s$"
-
-        if not re.match(regex % ('?', '?'), assignment):
-            raise RuntimeError('Assignment name doesn\'t match the shortName convention of PGdP course')
-
-        if not re.match(regex % ('', ''), assignment):
-            print('Warning: Usually shortNames for exercises follow the convention "w01h01",'
-                  ' you can find the correct shortName on ArTEMiS if pulling the repos fails')
-
-    students = args.students
-    # remove whitespaces, commas and duplicates
-    students = list(set(filter(lambda s: s, [s.replace(' ', '').replace(',', '') for s in students])))
-
-    exercise = api.get_exercise(assignment)
-    if exercise is None:
-        raise RuntimeError('Exercise does not exist, you can find the correct shortName on ArTEMiS')
-
-    deadline = api.get_deadline(exercise)
+    deadline = api.get_deadline(args.exercise)
 
     num_students = len(students)
-
-    if num_students == 0:
-        raise RuntimeError('No valid student name in args.students')
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -151,7 +129,13 @@ def command_new_result():
     # and combine positive and negative feedbacks
     feedbacks.extend([x for x in map(partial(dict_mapper, positive=False), args.negative)])
 
-    print(feedbacks)
+    print('Fetching results for all students, this may take a few seconds...')
+    results = api.get_results(api.get_exercise_id(args.exercise))
+
+    participations = api.get_participations(results, args.students)
+    print(participations)
+    print(api.get_participation_id(participations[0]))
+
     """
     new_result_body = NewResultBody(
         score=args.score,
@@ -189,6 +173,33 @@ def main():
 
     # instantiate the artemis api client
     api = ArtemisAPI(artemis)
+
+    # verify course name against patterns
+    if course_name == "pgdp1920":
+        regex = "^w[0-9][0-9]%s[hp][0-9][0-9]%s$"
+
+        if not re.match(regex % ('?', '?'), args.assignment):
+            raise RuntimeError('Assignment name doesn\'t match the shortName convention of PGdP course')
+
+        if not re.match(regex % ('', ''), args.assignment):
+            print('Warning: Usually shortNames for exercises follow the convention "w01h01",'
+                  ' you can find the correct shortName on ArTEMiS if pulling the repos fails')
+
+    # get exercise data from artemis, raise if it doesn't exist
+    args.exercise = api.get_exercise(args.assignment)
+    if args.exercise is None:
+        raise RuntimeError('Exercise does not exist, you can find the correct shortName on ArTEMiS')
+
+    # normalize student names
+    if hasattr(args, 'student'):
+        args.students = [args.student]
+
+    # by removing whitespaces, commas and duplicates
+    args.students = list(set(filter(lambda s: s, [s.replace(' ', '').replace(',', '') for s in args.students])))
+
+    # raise if no well-formed students have been passed to args
+    if not args.students:
+            raise RuntimeError('No valid student name in args.students')
 
     # dispatch command
     dispatch = {

@@ -69,16 +69,34 @@ class ArtemisAPI:
                 return exercise
         return None
 
-    def get_deadline(self, exercise):
-        if 'dueDate' in exercise:
-            return exercise['dueDate']
-        return None
+    @staticmethod
+    def get_exercise_id(exercise):
+        return exercise['id'] if 'id' in exercise else None
 
-    def post_new_result(self, new_result_body, assignment, student):
-        # type: (NewResultBody, str, str)
+    @staticmethod
+    def get_deadline(exercise):
+        return exercise['dueDate'] if 'dueDate' in exercise else None
+
+    def get_results(self, exercise_id):
+        return self.__get('/courses/%d/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=false' % (self._course['id'], exercise_id))
+
+    @staticmethod
+    def get_participations(results, students):
+        results = filter(lambda r: r['participation']['student']['login'] in students, results)
+        return map(lambda r: r['participation'], results)
+
+    @staticmethod
+    def get_participation_id(participation):
+        return participation['id'] if 'id' in participation else None
+
+    def post_new_result(self, participation_id, score, feedbacks):
+        pass
+        # type: (str, str, str, List[Dict[str, str, Boolean]])
+
+
         # result = self.__get('/courses/37/exercises/733/results?ratedOnly=true&withSubmissions=false&withAssessors=false')
-        result = self.__get('/participations/192130')
-        print(json.dumps(result, indent=4, sort_keys=True))
+        # result = self.__get('/participations/192130')
+        # print(json.dumps(result, indent=4, sort_keys=True))
 
         # TODO post result via Artemis api, use assignment and student vars if necessary
         # self.__post(route=?, data=data)
