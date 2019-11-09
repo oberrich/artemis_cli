@@ -144,21 +144,6 @@ def command_new_result():
     api.post_new_result(participations[0]['id'], args.score, args.text, feedbacks)
     print('Done!')
 
-
-
-    """
-    new_result_body = NewResultBody(
-        score=args.score,
-        result_text=args.text,
-        positive_feedback_entries=positive_feedback_entries,
-        negative_feedback_entries=negative_feedback_entries
-    )
-
-    api.post_new_result(student=args.student,
-                        assignment=args.assignment,
-                        score=args.score,
-                        result_text=args.text)
-    """
     sys.exit(1)
 
 
