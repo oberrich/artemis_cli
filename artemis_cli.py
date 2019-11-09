@@ -130,7 +130,6 @@ def command_get_scores():
 
 
 def command_new_result():
-<<<<<<< HEAD
     if args.positive is None:
         args.positive = []
 
@@ -141,33 +140,6 @@ def command_new_result():
 
     if any_invalid(args.positive) or any_invalid(args.negative):
         raise RuntimeError('Text for feedback is required (detail_text is optional, no extra arguments allowed)')
-=======
-    # TODO feedback not required
-
-    positive_feedback_entries = []  # type: [dict]
-    try:
-        if args.positive is not None:
-            for pos_feedback in args.positive:
-                text = pos_feedback[0]
-                detail_text = ''
-                if len(pos_feedback) == 2:
-                    detail_text = pos_feedback[1]
-                positive_feedback_entries.append(dict(text=text, detail_text=detail_text))
-    except IndexError:
-        raise Exception('Text for positive feedback is required (detail_text is optional, no extra arguments allowed)')
-
-    negative_feedback_entries = []  # type: [dict]
-    try:
-        if args.negative is not None:
-            for neg_feedback in args.negative:
-                text = neg_feedback[0]
-                detail_text = ''
-                if len(neg_feedback) == 2:
-                    detail_text = neg_feedback[1]
-                positive_feedback_entries.append(dict(text=text, detail_text=detail_text))
-    except IndexError:
-        raise Exception('Text for negative feedback is required (detail_text is optional, no extra arguments allowed)')
->>>>>>> 41ce0177b6f374164dbd9356f82a1f20921d9820
 
     dict_mapper = lambda f, positive: {
         'text': f[0],

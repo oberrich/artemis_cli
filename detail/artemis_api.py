@@ -75,14 +75,9 @@ class ArtemisAPI:
         return None
 
     def post_new_result(self, new_result_body, assignment, student):
-<<<<<<< HEAD
         # type: (NewResultBody, str, str)
         # result = self.__get('/courses/37/exercises/733/results?ratedOnly=true&withSubmissions=false&withAssessors=false')
         result = self.__get('/participations/192130')
-=======
-        # type: (NewResultBody, str, str) -> None
->>>>>>> 41ce0177b6f374164dbd9356f82a1f20921d9820
-
         print(json.dumps(result, indent=4, sort_keys=True))
 
         # TODO post result via Artemis api, use assignment and student vars if necessary
