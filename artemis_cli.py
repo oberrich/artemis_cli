@@ -12,6 +12,7 @@ from functools import partial
 from detail.artemis_api import ArtemisAPI
 from detail.arg_parser import ArgParser
 
+
 def run_git(params, cwd=None):
     params = ['git'] + params
 
