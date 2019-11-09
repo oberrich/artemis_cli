@@ -98,7 +98,7 @@ class ArtemisAPI:
         return participation['id'] if 'id' in participation else None
 
     def post_new_result(self, participation_id, score, text, feedbacks):
-        # type: (str, str, List[Dict[str, str, str, Boolean]])
+        # type: (str, int, str, List[Dict[str, str, str, bool]]) -> None
         participation = self.get_participation(participation_id)
         body = ManualResultBody(score, text, feedbacks, participation)
         self.__put('/manual-results', body)

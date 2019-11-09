@@ -34,6 +34,7 @@ def command_repos():
     # TODO apply sanitization in main function
     assignment = args.assignment
     deadline = api.get_deadline(args.exercise)
+    students = args.students
 
     num_students = len(args.students)
 
