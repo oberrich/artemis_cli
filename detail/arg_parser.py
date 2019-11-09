@@ -50,7 +50,7 @@ class ArgParser(argparse.ArgumentParser):
         #   -positive "Kommentare" "Gute Dokumentation"
         #   -negative "Bitte auf Formatierung achten" "Autoformat nutzen"
         result_parser = sub_parsers.add_parser('grade',
-                                               help='Submits a new grading for a student\'s assignment')
+                                               help='Submits grade for a student assignment')
 
         result_parser.add_argument('-a', '--assignment',
                                    metavar='assignment',

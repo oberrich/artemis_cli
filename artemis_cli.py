@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# pip install pyyaml argparse requests json typing
+# pip install pyyaml argparse requests json
 import yaml
 import os
 import sys
