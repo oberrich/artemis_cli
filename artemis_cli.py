@@ -146,6 +146,27 @@ def get_scores(quiet=False, verbose=False):
 
 
 def new_result(quiet=False, verbose=False):
+
+    positive_feedback_entries: List[Dict[str, str]] = []
+    if args.positive is not None:
+        for pos_feedback in args.positive:
+            positive_feedback_entries.append(dict(text=pos_feedback[0], detail_text=pos_feedback[1]))
+    negative_feedback_entries: List[Dict[str, str]] = []
+    if args.negative is not None:
+        for neg_feedback in args.negative:
+            negative_feedback_entries.append(dict(text=neg_feedback[0], detail_text=neg_feedback[1]))
+
+    new_result_body = NewResultBody(
+        score=args.score[0],
+        result_text=args.text[0],
+        positive_feedback_entries=positive_feedback_entries,
+        negative_feedback_entries=negative_feedback_entries
+    )
+
+    api.post_new_result(new_result_body=new_result_body,
+                        assignment=args.assignment[0],
+                        student=args.student[0])
+
     print('Chosen command: newresult not implemented yet.')
     sys.exit(1)
 
