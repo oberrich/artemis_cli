@@ -130,13 +130,11 @@ def command_get_scores():
 
 
 def command_new_result():
-    if args.positive is None:
-        args.positive = []
+    # assign empty list if is None
+    args.positive = [] if args.positive is None else args.positive
+    args.negative = [] if args.negative is None else args.negative
 
-    if args.negative is None:
-        args.negative = []
-
-    any_invalid = lambda fs: any(len(f) != 1 and len(f) != 2 for f in fs)
+    any_invalid = lambda fs: any((len(f) != 1 and len(f) != 2) or not f[0] for f in fs)
 
     if any_invalid(args.positive) or any_invalid(args.negative):
         raise RuntimeError('Text for feedback is required (detail_text is optional, no extra arguments allowed)')
