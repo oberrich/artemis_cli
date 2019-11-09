@@ -10,23 +10,7 @@ from detail.arg_parser import ArgParser
 
 from detail.artemis_api_payloads import NewResultBody
 
-# parse arguments
-parser = ArgParser()
-args = parser.parse_args()
-
-# load config
-with open('config.yml', 'r') as config_file:
-    cfg = yaml.safe_load(config_file)
-
-# alias commonly used config fields
-artemis     = cfg['artemis']
-bitbucket   = cfg['bitbucket']['base_url']
-course_name = artemis['course']['name']
-
-# instantiate the artemis api client
-api = ArtemisAPI(artemis)
-
-def action_repos(quiet=False, verbose=False):
+def command_repos(quiet=False, verbose=False):
     print('Fetching %s assignment %s for students...\n' % (course_name, assignment))
 
     students = args.students
@@ -59,11 +43,11 @@ def action_repos(quiet=False, verbose=False):
         #  not have permission to access it.')
 
 
-def action_get_scores(quiet=False, verbose=False):
+def command_get_scores(quiet=False, verbose=False):
     print('Chosen command: getscores not implemented yet.')
     sys.exit(1)
 
-def action_new_result(quiet=False, verbose=False):
+def command_new_result(quiet=False, verbose=False):
 
     positive_feedback_entries = [] # type: List[Dict[str, str]]
     if args.positive is not None:
@@ -88,15 +72,37 @@ def action_new_result(quiet=False, verbose=False):
                         student=args.student)
     sys.exit(1)
 
-# MAIN
-command_dispatch = {
-    'repos': action_repos,
-    'getscores': action_get_scores,
-    'newresult': action_new_result,
-}
+def main():
+    global args, api, bitbucket, course_name, course_id
 
-command_dispatch[args.command](quiet=args.quiet, verbose=args.verbose)
+    # parse arguments
+    parser = ArgParser()
+    args = parser.parse_args()
 
+    # load config
+    with open('config.yml', 'r') as config_file:
+        cfg = yaml.safe_load(config_file)
+
+    # alias commonly used config fields
+    artemis     = cfg['artemis']
+    bitbucket   = cfg['bitbucket']['base_url']
+    course_name = artemis['course']['name']
+    course_id   = artemis['course']['id']
+
+    # instantiate the artemis api client
+    api = ArtemisAPI(artemis)
+
+    # dispatch command
+    dispatch = {
+        'repos': command_repos,
+        'getscores': command_get_scores,
+        'newresult': command_new_result
+    }
+
+    dispatch[args.command](quiet=args.quiet, verbose=args.verbose)
+
+if __name__=="__main__":
+    main()
 
 # TODO finish implementing API in detail/artemis_api.py
 # TODO port backup/artemis-cli.sh to python

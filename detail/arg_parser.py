@@ -6,9 +6,9 @@ class ArgParser(argparse.ArgumentParser):
             description='A command-line application for tutors to more productively grade programming excises on ArTEMiS')
 
         sub_parsers = self.add_subparsers(
-            title='actions',
+            title='commands',
             dest='command',
-            description='List of valid actions',
+            description='List of valid commands',
             help='Additional help',
             parser_class=argparse.ArgumentParser)
 
