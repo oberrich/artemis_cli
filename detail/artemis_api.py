@@ -44,6 +44,10 @@ class ArtemisAPI:
         # type: (str, Serializable) -> dict
         return self.session.post(self._base_url + route, data=body.serialize()).json()
 
+    def __put(self, route, body):
+        # type: (str, Serializable) -> dict
+        return self.session.put(self._base_url + route, data=body.serialize()).json()
+
     def __get(self, route):
         # type: (str) -> dict
         return self.session.get(self._base_url + route).json()
@@ -89,10 +93,19 @@ class ArtemisAPI:
     def get_participation_id(participation):
         return participation['id'] if 'id' in participation else None
 
-    def post_new_result(self, participation_id, score, feedbacks):
-        pass
-        # type: (str, str, str, List[Dict[str, str, Boolean]])
+    def post_new_result(self, participation, score, text, feedbacks):
+        # type: (str, str, List[Dict[str, str, str, Boolean]])
+        participation_id = self.get_participation_id(participation)
 
+        body = ManualResultBody(score, text, feedbacks, participation)
+
+        result = self.__put('/manual-results', body)
+        print(result)
+
+        #participation = self.__get('/participations/%d' % participation_id)
+
+        #print(json.dumps(result, indent=4, sort_keys=True))
+        pass
 
         # result = self.__get('/courses/37/exercises/733/results?ratedOnly=true&withSubmissions=false&withAssessors=false')
         # result = self.__get('/participations/192130')

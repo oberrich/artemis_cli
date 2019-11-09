@@ -12,9 +12,6 @@ from functools import partial
 from detail.artemis_api import ArtemisAPI
 from detail.arg_parser import ArgParser
 
-from detail.artemis_api_payloads import NewResultBody
-
-
 def run_git(params, cwd=None):
     params = ['git'] + params
 
@@ -108,6 +105,10 @@ def command_get_scores():
 
 
 def command_new_result():
+    # TODO change so we can reuse it for submitting all student's scores
+    if args.score not in range(0, 101):
+        raise RuntimeError('score has to be within [0;100]')
+
     # assign empty list if is None
     args.positive = [] if args.positive is None else args.positive
     args.negative = [] if args.negative is None else args.negative
@@ -133,8 +134,12 @@ def command_new_result():
     results = api.get_results(api.get_exercise_id(args.exercise))
 
     participations = api.get_participations(results, args.students)
-    print(participations)
-    print(api.get_participation_id(participations[0]))
+    if not participations:
+        raise RuntimeError('No participations for any of the students')
+
+    # TODO ensure args.text != ''
+
+    api.post_new_result(participations[0], args.score, args.text, feedbacks)
 
     """
     new_result_body = NewResultBody(
@@ -199,7 +204,7 @@ def main():
 
     # raise if no well-formed students have been passed to args
     if not args.students:
-            raise RuntimeError('No valid student name in args.students')
+        raise RuntimeError('No valid student name in args.students')
 
     # dispatch command
     dispatch = {

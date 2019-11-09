@@ -62,12 +62,12 @@ class ArgParser(argparse.ArgumentParser):
                                    metavar='score',
                                    required=True,
                                    type=int,
-                                   help='The Score of the assignment (e.g. 80)')
+                                   help='The score (0-100) of the assignment (e.g. 80)')
 
         result_parser.add_argument('-text',
                                    required=True,
                                    metavar='result_text',
-                                   help='The Result Text of the assignment (e.g. "Gut gemacht")')
+                                   help='The result text of the assignment (e.g. "Gut gemacht")')
 
         result_parser.add_argument('-pos', '--positive',
                                    metavar=('text', 'detail_text'),

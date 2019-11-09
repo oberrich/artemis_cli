@@ -8,12 +8,11 @@ class Serializable:
         return json.dumps(self, default=self.default, indent=2, separators=(',', ': '))
 
 
-class NewResultBody(Serializable):
+class ManualResultBody(Serializable):
     '''
     Artemis api new result schema:
       {
         "score" : 85,
-        "id": 191374,
         "buildArtifact": false
         "assessmentType": "MANUAL"
         "resultString": "Excellent!",
@@ -32,15 +31,17 @@ class NewResultBody(Serializable):
       }
     '''
 
-    def __init__(self, score, result_text, positive_feedback_entries = None, negative_feedback_entries = None):
+    def __init__(self, score, text, feedbacks, participation):
         # type: (int, str, List[Dict[str,str]], List[Dict[str,str]])
-
+        self.assessmentType = 'MANUAL'
+        self.buildArtifact = False
         self.score = score
-        self.id = 12345  # TODO get right new result(?) id
-        self.resultString = result_text
+        self.resultString = text
         self.successful = True if score == 100 else False
-        self.feedbacks = [] # type: List[FeedbackBody]
+        self.participation = participation
+        self.feedbacks = map(lambda f: FeedbackBody(f), feedbacks)
 
+        """
         if positive_feedback_entries is not None:
             for pos_feedback in positive_feedback_entries:
                 pos_feedback_body = FeedbackBody(positive=True,
@@ -53,19 +54,17 @@ class NewResultBody(Serializable):
                                                  text=neg_feedback["text"],
                                                  detail_text=neg_feedback["detail_text"])
                 self.feedbacks.append(neg_feedback_body)
-
+        """
 
 class FeedbackBody(Serializable):
-    def __init__(self, positive, text, detail_text):
+    def __init__(self, feedback):
         # type: (bool, str, str)
         self.credits = 0            # default
         self.type = 'MANUAL'        # default
-        self.text = text
-        self.detailText = detail_text
         self.referenceId = None     # default
         self.referenceType = None   # default
-        self.positive = positive
 
+        [setattr(self, k, v) for k,v in feedback.items()]
 
 class LoginBody(Serializable):
     def __init__(self, username, password):
