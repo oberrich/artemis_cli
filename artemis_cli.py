@@ -18,8 +18,11 @@ def command_repos(quiet=False, verbose=False):
     # TODO check for this in other commands
     assignment = args.assignment
 
-    if course_name == "pgdp1920" and not re.match("^w[0-9][0-9]?[hp][0-9][0-9]?$", assignment):
-        raise RuntimeError('Assignment name doesn\'t match the shortName convention of PGdP course')
+    if course_name == "pgdp1920":
+        if not re.match("^w[0-9][0-9]?[hp][0-9][0-9]?$", assignment):
+            raise RuntimeError('Assignment name doesn\'t match the shortName convention of PGdP course')
+        if not re.match("^w[0-9][0-9][hp][0-9][0-9]$", assignment):
+            print('Warning: Usually shortNames for exercises follow the convention "w01h01", find the shortName on ArTEMiS if pulling the repos fails')
 
     students = args.students
     # remove whitespaces, commas and duplicates
@@ -37,6 +40,10 @@ def command_repos(quiet=False, verbose=False):
     for student in students:
         print('Fetching assigment for %s...' % student)
 
+        repo_name = "%s%s-%s" % (course_name, assignment, student)
+        repo_url = os.path.join(bitbucket, 'scm', course_name + assignment, repo_name + '.git')
+
+        print(repo_url)
 
         pass
         """
