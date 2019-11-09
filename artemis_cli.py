@@ -5,26 +5,37 @@ import yaml
 import os
 import sys
 import re
+import subprocess
 
 from detail.artemis_api import ArtemisAPI
 from detail.arg_parser import ArgParser
 
 from detail.artemis_api_payloads import NewResultBody
 
+def run_git(params, cwd=None):
+    params = ['git'] + params
+
+    if args.verbose:
+        return subprocess.call(params, cwd=cwd)
+
+    p = subprocess.Popen(params, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    _, _ = p.communicate()
+    return p.returncode
+
 def generate_gradebook(students):
     pass # TODO
 
-def command_repos(quiet=False, verbose=False):
-    # TODO check for this in other commands
+def command_repos():
+    # TODO apply sanizization in main function
     assignment = args.assignment
 
     if course_name == "pgdp1920":
         regex = "^w[0-9][0-9]%s[hp][0-9][0-9]%s$"
 
-        if not re.match(regex.format('?', '?'), assignment):
+        if not re.match(regex % ('?', '?'), assignment):
             raise RuntimeError('Assignment name doesn\'t match the shortName convention of PGdP course')
 
-        if not re.match(regex.format('', ''), assignment):
+        if not re.match(regex % ('', ''), assignment):
             print('Warning: Usually shortNames for exercises follow the convention "w01h01", find the shortName on ArTEMiS if pulling the repos fails')
 
     students = args.students
@@ -38,50 +49,55 @@ def command_repos(quiet=False, verbose=False):
 
     students.extend(['exercise', 'solution', 'tests'])
 
-    print('Fetching %s assignment %s for student%s...' % (course_name, assignment, '' if num_students == 1 else 's'))
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+
+    print('Fetching %s assignment %s for student%s.' % (course_name, assignment, '' if num_students == 1 else 's'))
 
     for student in students:
-        print('Fetching assigment for %s...' % student)
+        sys.stdout.write('Fetching assigment for %s... ' % student)
+        sys.stdout.flush()
 
         repo_name = "%s%s-%s" % (course_name, assignment, student)
         repo_url = os.path.join(bitbucket, 'scm', course_name + assignment, repo_name + '.git')
 
-        print(repo_url)
+        # TODO create a folder structure unless flatten option in config is set
+        repo_dir = os.path.join(script_dir, repo_name)
 
+        if os.path.exists(repo_dir):
+            # directory for repo already exists
+            if not os.path.exists(os.path.join(repo_dir, '.git')):
+                print('failed! Directory for student\'s repository already existed but wasn\'t a git repository.')
+                continue
+
+            run_git(['checkout', 'master'], cwd=repo_dir)
+
+            status = run_git(['pull'], cwd=repo_dir)
+
+        else:
+            os.mkdir(repo_dir)
+
+            status = run_git(['clone', repo_url, repo_dir], cwd=repo_dir)
+            if status != 0:
+                os.rmdir(repo_dir)
+                print('failed! `git clone` returned %d.' % status)
+                continue
+
+            if not any(student in s for s in ['exercise', 'solution', 'tests']):
+                # TODO checkout master@deadline
+                # git checkout `git rev-list -1 --before="$due_date" master`
+                pass
+
+            # set push url to `forbidden` to avoid accidental pushes into student repository
+            run_git(['remote', 'set-url', '--push', 'origin', 'forbidden'], cwd=repo_dir)
+
+        print("ok!")
         pass
-        """
-        # TODO unflatten project structure, add option to flatten it
-        # TODO add option to customize path to root folder
 
-        # example repo url: https://bitbucket.ase.in.tum.de/scm/PGDP1920W01P01/pgdp1920w01p01-ab42cde.git
-        print('Fetching assigment for %s...' % student)
-
-
-        course_assignment = course_name + assignment
-        remote_repo = course_name + '-' + student + '.git'
-
-        local_repo = os.path.join('..', course_assignment + '-' + student)
-
-        if not os.path.exists(local_repo):
-            os.mkdir(local_repo)
-
-        os.chdir(local_repo)
-
-        # TODO: After resetting repository for a student make sure to
-
-        repo_url = os.path.join(bitbucket, 'scm', course_assignment, remote_repo)
-        clone_cmd = 'git clone ' + repo_url
-        print(clone_cmd)
-        os.system(clone_cmd)
-        # TODO: no access to repo ('The requested repository does not exist, or you do
-        #  not have permission to access it.')
-        """
-
-def command_get_scores(quiet=False, verbose=False):
+def command_get_scores():
     print('Chosen command: getscores not implemented yet.')
     sys.exit(1)
 
-def command_new_result(quiet=False, verbose=False):
+def command_new_result():
     # TODO feedback not required
 
     positive_feedback_entries = [] # type: List[Dict[str, str]]
@@ -111,6 +127,8 @@ def command_new_result(quiet=False, verbose=False):
 def main():
     global parser, args, api, bitbucket, course_name, course_id
 
+    # disable stdout if --quiet
+
     # parse arguments
     parser = ArgParser()
     args = parser.parse_args()
@@ -135,7 +153,7 @@ def main():
         'newresult': command_new_result
     }
 
-    dispatch[args.command](quiet=args.quiet, verbose=args.verbose)
+    dispatch[args.command]()
 
 if __name__=="__main__":
     main()
