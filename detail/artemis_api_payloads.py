@@ -17,6 +17,7 @@ class ManualResultBody(Serializable):
         self.resultString = text
         self.successful = True if score == 100 else False
         self.participation = participation
+        self.completionDate = datetime.datetime.utcnow().isoformat()[:-3] + 'Z'
         self.feedbacks = list(map(lambda f: FeedbackBody(f), feedbacks))
 
 

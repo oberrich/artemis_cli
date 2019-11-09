@@ -35,7 +35,7 @@ def command_repos():
     assignment = args.assignment
     deadline = api.get_deadline(args.exercise)
 
-    num_students = len(students)
+    num_students = len(args.students)
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -46,7 +46,7 @@ def command_repos():
 
     num_succeeded = 0
 
-    for student in special_repos + students:
+    for student in special_repos + args.students:
         sys.stdout.write('Fetching assigment for %s... ' % student)
         sys.stdout.flush()
 
@@ -95,7 +95,7 @@ def command_repos():
         num_succeeded += 1
         print("ok!")
 
-    num_repos = len(students) + len(special_repos)
+    num_repos = num_students + len(special_repos)
     print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (
         num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
 
