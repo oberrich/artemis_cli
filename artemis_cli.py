@@ -19,8 +19,8 @@ def run_git(params, cwd=None):
         return subprocess.call(params, cwd=cwd)
 
     p = subprocess.Popen(params, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    _, _ = p.communicate()
-    return p.returncode
+    out, _ = p.communicate()
+    return (p.returncode, out)
 
 def generate_gradebook(students):
     pass # TODO
@@ -92,14 +92,17 @@ def command_repos():
         else:
             os.mkdir(repo_dir)
 
-            status = run_git(['clone', repo_url, repo_dir], cwd=repo_dir)
-            if status != 0:
+            s = run_git(['clone', repo_url, repo_dir], cwd=repo_dir)
+            print(s)
+
+            if s != 0:
                 os.rmdir(repo_dir)
-                print('failed! `git clone` returned %d.' % status)
+                print('failed! `git clone` returned %d.' % s)
                 continue
 
         if not any(student in s for s in ['exercise', 'solution', 'tests']) and deadline is not None:
-            run_git(['checkout', '`git rev-list -1 --before="%s" master`' % deadline], cwd=repo_dir)
+            _, rev = run_git(['rev-list', '-1', '--before="%s"' % deadline, 'master'], cwd=repo_dir)
+            run_git(['checkout', '`%s`' % rev], cwd=repo_dir)
 
         run_git(['remote', 'set-url', '--push', 'origin', 'forbidden'], cwd=repo_dir)
 
