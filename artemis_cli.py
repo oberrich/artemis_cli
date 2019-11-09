@@ -19,9 +19,10 @@ def command_repos(quiet=False, verbose=False):
     assignment = args.assignment
 
     if course_name == "pgdp1920":
-        if not re.match("^w[0-9][0-9]?[hp][0-9][0-9]?$", assignment):
+        regex = r"^w[0-9][0-9]%s[hp][0-9][0-9]%s$"
+        if not re.match(regex % ('?', '?'), assignment):
             raise RuntimeError('Assignment name doesn\'t match the shortName convention of PGdP course')
-        if not re.match("^w[0-9][0-9][hp][0-9][0-9]$", assignment):
+        if not re.match(regex % ('', ''), assignment):
             print('Warning: Usually shortNames for exercises follow the convention "w01h01", find the shortName on ArTEMiS if pulling the repos fails')
 
     students = args.students
