@@ -24,13 +24,15 @@ def run_git(params, cwd=None):
         print('Output of git ' + params[1] + ':')
         print('  ' + out)
 
-    return (p.returncode, out)
+    return p.returncode, out
+
 
 def generate_gradebook(students):
-    pass # TODO
+    pass  # TODO
+
 
 def command_repos():
-    # TODO apply sanizization in main function
+    # TODO apply sanitization in main function
     assignment = args.assignment
 
     if course_name == "pgdp1920":
@@ -40,7 +42,8 @@ def command_repos():
             raise RuntimeError('Assignment name doesn\'t match the shortName convention of PGdP course')
 
         if not re.match(regex % ('', ''), assignment):
-            print('Warning: Usually shortNames for exercises follow the convention "w01h01", you can find the correct shortName on ArTEMiS if pulling the repos fails')
+            print('Warning: Usually shortNames for exercises follow the convention "w01h01",'
+                  ' you can find the correct shortName on ArTEMiS if pulling the repos fails')
 
     students = args.students
     # remove whitespaces, commas and duplicates
@@ -48,7 +51,7 @@ def command_repos():
 
     exercise = api.get_exercise(assignment)
     if exercise is None:
-        raise RuntimeError('Exercise doesn\'t exist, you can find the correct shortName on ArTEMiS')
+        raise RuntimeError('Exercise does not exist, you can find the correct shortName on ArTEMiS')
 
     deadline = api.get_deadline(exercise)
 
@@ -60,7 +63,7 @@ def command_repos():
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
     print('Fetching %s-%s@{%s} for %d student%s.\n' % (course_name, assignment, str(deadline),
-        num_students, '' if num_students == 1 else 's'))
+                                                       num_students, '' if num_students == 1 else 's'))
 
     special_repos = ['exercise', 'solution', 'tests']
 
@@ -78,7 +81,9 @@ def command_repos():
 
         if os.path.exists(repo_dir):
             if not os.path.isdir(repo_dir):
-                print('failed! Directory where student\'s repository is supposed to be clone into cannot be created because a non-directory file with the same name already exists.')
+                print(
+                    'failed! Directory where student\'s repository is supposed to be clone into cannot be '
+                    'created because a non-directory file with the same name already exists.')
                 continue
             elif not os.listdir(repo_dir):
                 os.rmdir(repo_dir)
@@ -86,7 +91,7 @@ def command_repos():
         if os.path.exists(repo_dir):
             # directory for repo already exists
             if not os.path.exists(os.path.join(repo_dir, '.git')):
-                print('failed! Directory for student\'s repository already existed but wasn\'t a git repository.')
+                print('failed! Directory for student\'s repository already existed but was not a git repository.')
                 continue
 
             run_git(['checkout', 'master'], cwd=repo_dir)
@@ -114,23 +119,41 @@ def command_repos():
         print("ok!")
 
     num_repos = len(students) + len(special_repos)
-    print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
+    print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (
+        num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
+
 
 def command_get_scores():
     print('Chosen command: getscores not implemented yet.')
     sys.exit(1)
 
+
 def command_new_result():
     # TODO feedback not required
 
-    positive_feedback_entries = [] # type: List[Dict[str, str]]
-    if args.positive is not None:
-        for pos_feedback in args.positive:
-            positive_feedback_entries.append(dict(text=pos_feedback[0], detail_text=pos_feedback[1]))
-    negative_feedback_entries = [] # type: List[Dict[str, str]]
-    if args.negative is not None:
-        for neg_feedback in args.negative:
-            negative_feedback_entries.append(dict(text=neg_feedback[0], detail_text=neg_feedback[1]))
+    positive_feedback_entries = []  # type: List[Dict[str, str]]
+    try:
+        if args.positive is not None:
+            for pos_feedback in args.positive:
+                text = pos_feedback[0]
+                detail_text = ''
+                if len(pos_feedback) == 2:
+                    detail_text = pos_feedback[1]
+                positive_feedback_entries.append(dict(text=text, detail_text=detail_text))
+    except IndexError:
+        raise Exception('Text for positive feedback is required (detail_text is optional, no extra arguments allowed)')
+
+    negative_feedback_entries = []  # type: List[Dict[str, str]]
+    try:
+        if args.negative is not None:
+            for neg_feedback in args.negative:
+                text = neg_feedback[0]
+                detail_text = ''
+                if len(neg_feedback) == 2:
+                    detail_text = neg_feedback[1]
+                positive_feedback_entries.append(dict(text=text, detail_text=detail_text))
+    except IndexError:
+        raise Exception('Text for negative feedback is required (detail_text is optional, no extra arguments allowed)')
 
     new_result_body = NewResultBody(
         score=args.score,
@@ -161,10 +184,10 @@ def main():
         cfg = yaml.safe_load(config_file)
 
     # alias commonly used config fields
-    artemis     = cfg['artemis']
-    bitbucket   = cfg['bitbucket']['base_url']
+    artemis = cfg['artemis']
+    bitbucket = cfg['bitbucket']['base_url']
     course_name = artemis['course']['name']
-    course_id   = artemis['course']['id']
+    course_id = artemis['course']['id']
 
     # instantiate the artemis api client
     api = ArtemisAPI(artemis)
@@ -178,7 +201,8 @@ def main():
 
     dispatch[args.command]()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()
 
 # TODO finish implementing API in detail/artemis_api.py
