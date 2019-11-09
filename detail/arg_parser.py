@@ -14,6 +14,8 @@ class ArgParser(argparse.ArgumentParser):
             help='Additional help',
             parser_class=argparse.ArgumentParser)
 
+        # repos
+        # syntax: ./artemis_cli.py -a w01h01 -s ge42abc
         repos_parser = sub_parsers.add_parser('repos',
                                               help='Download student exercise repositories')
 
@@ -26,6 +28,8 @@ class ArgParser(argparse.ArgumentParser):
                                   nargs='+',
                                   help='The students TUM ids to be processed (e.g. ge36feg ba12sup, ...)')
 
+        # scores
+        # syntax: ./artemis_cli.py -a w01h01 -s ge42abc
         scores_parser = sub_parsers.add_parser('scores',
                                                help='Get scores for students\' assignments [not yet implemented]')
 
@@ -39,11 +43,10 @@ class ArgParser(argparse.ArgumentParser):
                                    help='The students TUM ids to be processed (e.g. ge36feg ba12sup, ...)')
 
         # newresult
-        # sytax:
-        # -a w01h01 -s ab43cde
-        # -score 80 -text "Gut gemacht "
+        # syntax: ./artemis_cli.py -a w01h01 -s ab43cde
+        #   -score 80 -text "Gut gemacht"
         #   -positive "Kommentare" "Gute Dokumentation"
-        #   -negative "Formatierung" "Bitte nutze Autoformat"
+        #   -negative "Bitte auf Formatierung achten" "Autoformat nutzen"
         result_parser = sub_parsers.add_parser('newresult',
                                                help='Post a new result for a student\'s assignment '
                                                     '[not yet implemented]')
