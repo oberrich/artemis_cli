@@ -1,4 +1,8 @@
 # artemis-cli
+A command-line application for tutors to more productively grade programming excises on ArTEMiS
+## Beta notice
+This program is still in beta and hasn't been thoroughly tested yet, make sure your grades were actually submitted properly.
+
 ## Overview and purpose
 Used for the introductory course "Praktikum Grundlagen der Programmierung"
 [IN0002](https://campus.tum.de/tumonline/wbModHb.wbShowMHBReadOnly?pKnotenNr=452806) at TU Munich.
