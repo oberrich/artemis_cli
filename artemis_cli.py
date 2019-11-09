@@ -26,18 +26,46 @@ def run_git(params, cwd=None):
     return p.returncode, out
 
 
-def generate_gradebook(students):
-    pass  # TODO
+def generate_gradebook(dir, students):
+    filename = os.path.join(dir, 'gradebook.yml')
+
+    if os.path.exists(filename):
+        print('Warning: gradebook already existed, delete the gradebook and run '
+              'the repos command again if you want to generate a new gradebook.')
+
+    gradebook = {
+        'assignment': args.assignment,
+        'assessments': []
+    }
+
+    gradebook['assessments'] = list(map(lambda s: {
+        'name': s,
+        'score': 100,
+        'text': '',
+        'positive': [
+            ['', '']
+        ],
+        'negative': [
+            ['', ''],
+            ['', '']
+        ]
+    }, students))
+
+    with open(filename, 'w') as file:
+        yaml.dump(gradebook, file, encoding='utf-8')
+
+    print('Successfully created %s' % filename)
 
 
 def command_repos():
     # TODO apply sanitization in main function
     assignment = args.assignment
     deadline = api.get_deadline(args.exercise)
-    students = args.students
 
     num_students = len(args.students)
+    num_succeeded = 0
 
+    # TODO rename to root_dir and add option to config.yml
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
     print('Fetching %s-%s@{%s} for %d student%s.\n' % (course_name, assignment, str(deadline),
@@ -45,7 +73,19 @@ def command_repos():
 
     special_repos = ['exercise', 'solution', 'tests']
 
-    num_succeeded = 0
+    course_dir = os.path.join(script_dir, course_name)
+    if not os.path.exists(course_dir):
+        os.mkdir(course_dir)
+    elif not os.path.isdir(course_dir):
+        print('Failed to create %s/ folder, because a non-directory file with the same name already exists.' % course_dir)
+        sys.exit(1)
+
+    assignment_dir = os.path.join(course_dir, assignment)
+    if not os.path.exists(assignment_dir):
+        os.mkdir(assignment_dir)
+    elif not os.path.isdir(assignment_dir):
+        print('Failed to create %s/ folder, because a non-directory file with the same name already exists.' % assignment_dir)
+        sys.exit(1)
 
     for student in special_repos + args.students:
         sys.stdout.write('Fetching assigment for %s... ' % student)
@@ -54,8 +94,7 @@ def command_repos():
         repo_name = "%s%s-%s" % (course_name, assignment, student)
         repo_url = os.path.join(bitbucket, 'scm', course_name + assignment, repo_name + '.git')
 
-        # TODO create a folder structure unless flatten option in config is set
-        repo_dir = os.path.join(script_dir, repo_name)
+        repo_dir = os.path.join(assignment_dir, student)
 
         if os.path.exists(repo_dir):
             if not os.path.isdir(repo_dir):
@@ -97,19 +136,46 @@ def command_repos():
         print("ok!")
 
     num_repos = num_students + len(special_repos)
-    print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (
-        num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
+    print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
 
+    #if num_students > 2:
+    generate_gradebook(assignment_dir, args.students)
+
+
+def command_grades():
+    print('Fetching results for all students, this may take a few seconds...')
+    results = api.get_results(api.get_exercise_id(args.exercise), args.students)
+
+    for assessment in args.gradebook['assessments']:
+        try:
+            args.students[0] = assessment['name'] # hacky
+            args.score = assessment['score']
+            args.text = assessment['text']
+            args.positive = list(filter(lambda f: f[0], assessment['positive']))
+            args.negative = list(filter(lambda f: f[0], assessment['negative']))
+
+            command_grade(results=results)
+        except RuntimeError as err:
+            print('  Failed with error: ' + str(err))
+            print('  Continuing with next student')
+
+    print('Done!')
 
 def command_get_scores():
     print('Chosen command: getscores not implemented yet.')
     sys.exit(1)
 
 
-def command_new_result():
+def command_grade(results=None):
+    results = results[:]
+    is_internal_use = results is not None
+
     # TODO change so we can reuse it for submitting all student's scores
     if args.score not in range(0, 101):
         raise RuntimeError('score has to be within [0;100]')
+
+    if not args.text:
+        raise RuntimeError('text cannot be \'\' or None')
 
     # assign empty list if is None
     args.positive = [] if args.positive is None else args.positive
@@ -132,20 +198,19 @@ def command_new_result():
     # and combine positive and negative feedbacks
     feedbacks.extend([x for x in list(map(partial(dict_mapper, positive=False), args.negative))])
 
-    print('Fetching results for all students, this may take a few seconds...')
-    results = api.get_results(api.get_exercise_id(args.exercise))
+    if not is_internal_use:
+        print('Fetching results for all students, this may take a few seconds...')
+        results = api.get_results(api.get_exercise_id(args.exercise))
 
-    participations = api.get_participations(results, args.students)
+    participations = [p['participation'] for p in results if p['participation']['student']['login'] == args.students[0]]
     if not participations:
         raise RuntimeError('No participations for any of the students')
 
-    # TODO ensure args.text != ''
-
     print('Submitting feedback for student ' + args.students[0])
     api.post_new_result(participations[0]['id'], args.score, args.text, feedbacks)
-    print('Done!')
 
-    sys.exit(1)
+    if not is_internal_use:
+        print('Done!')
 
 
 def main():
@@ -169,6 +234,20 @@ def main():
 
     # instantiate the artemis api client
     api = ArtemisAPI(artemis)
+
+    if args.command == 'grades':
+        args.gradebook = None
+
+        try:
+            with open(args.gradebook_file, 'r') as file:
+                args.gradebook = yaml.load(file)
+        except FileNotFoundError as err:
+            print(err)
+            print('Example for gradebook path pgdp1920/w01h01/gradebook.yml')
+            sys.exit(1)
+
+        args.assignment = args.gradebook['assignment']
+        args.students = list(map(lambda s: s['name'], args.gradebook['assessments']))
 
     # verify course name against patterns
     if course_name == "pgdp1920":
@@ -200,8 +279,8 @@ def main():
     # dispatch command
     dispatch = {
         'repos': command_repos,
-        # 'getscores': command_get_scores,
-        'newresult': command_new_result
+        'grade': command_grade,
+        'grades': command_grades
     }
 
     dispatch[args.command]()

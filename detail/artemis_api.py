@@ -81,14 +81,11 @@ class ArtemisAPI:
     def get_deadline(exercise):
         return exercise['dueDate'] if 'dueDate' in exercise else None
 
-    def get_results(self, exercise_id, students = None):
+    def get_results(self, exercise_id, students=None):
         results = self.__get('/courses/%d/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=false' % (self._course['id'], exercise_id))
         if students:
-            results = filter(lambda r: r['participation']['student']['login'] in students, results)
+            results = list(filter(lambda r: r['participation']['student']['login'] in students, results))
         return results
-
-    def get_participations(self, results, students):
-        return list(map(lambda r: r['participation'], filter(lambda r: r['participation']['student']['login'] in students, results)))
 
     def get_participation(self, participation_id):
         return self.__get('/participations/%d' % participation_id)
@@ -101,4 +98,4 @@ class ArtemisAPI:
         # type: (str, int, str, List[Dict[str, str, str, bool]]) -> None
         participation = self.get_participation(participation_id)
         body = ManualResultBody(score, text, feedbacks, participation)
-        self.__put('/manual-results', body)
+        self.__post('/manual-results', body)
