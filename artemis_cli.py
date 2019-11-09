@@ -42,6 +42,9 @@ def command_repos():
     # remove whitespaces, commas and duplicates
     students = list(set(filter(lambda s: s, [s.replace(' ', '').replace(',', '') for s in students])))
 
+    exercise = api.get_exercise(assignment)
+    deadline = None if exercise is None else api.get_deadline(exercise)
+
     num_students = len(students)
 
     if num_students == 0:

@@ -41,11 +41,11 @@ class ArtemisAPI:
 
     def __post(self, route, body):
         # type: (string, Serializable) -> Dict
-        return json.loads(self.session.post(self._base_url + route, data=body.serialize()).text)
+        return self.session.post(self._base_url + route, data=body.serialize()).json()
 
     def __get(self, route):
         # type: (string) -> Dict
-        return json.loads(self.session.get(self._base_url + route))
+        return self.session.get(self._base_url + route).json()
 
     def __authenticate(self):
         body = LoginBody(
@@ -59,6 +59,19 @@ class ArtemisAPI:
             raise RuntimeError('Failed to authenticate!\nExpected field \'id_token\' in\n  ' + str(resp))
 
         self.session.auth = ('Bearer', resp['id_token'])
+
+    def get_exercise(short_name):
+        exercises = self.__get('/courses/%d/programming-exercises/' % course_id)
+
+        for exercise in exercises:
+            if exercise['shortName'] == short_name:
+                return exercise
+        return None
+
+    def get_due_date(exercise):
+        if 'dueDate' in attrs:
+            return attrs['dueDate']
+        return None
 
     def post_new_result(self, new_result_body, assignment, student):
         # type: (NewResultBody, str, str)
