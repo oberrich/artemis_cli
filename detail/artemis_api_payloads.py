@@ -1,11 +1,12 @@
 import json
+import datetime
 
 class Serializable:
     def default(self, o):
         return o.__dict__
 
     def serialize(self):
-        return json.dumps(self, default=self.default, indent=2, separators=(',', ': '))
+        return json.dumps(self, default=self.default, indent=2, sort_keys=True, separators=(',', ': '))
 
 
 class ManualResultBody(Serializable):
@@ -33,7 +34,6 @@ class ManualResultBody(Serializable):
 
     def __init__(self, score, text, feedbacks, participation):
         # type: (int, str, List[Dict[str,str]], List[Dict[str,str]])
-        self.assessmentType = 'MANUAL'
         self.buildArtifact = False
         self.score = score
         self.resultString = text

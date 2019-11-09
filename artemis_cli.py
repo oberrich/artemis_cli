@@ -139,7 +139,11 @@ def command_new_result():
 
     # TODO ensure args.text != ''
 
-    api.post_new_result(participations[0], args.score, args.text, feedbacks)
+    print('Submitting feedback for student ' + args.students[0])
+    api.post_new_result(participations[0]['id'], args.score, args.text, feedbacks)
+    print('Done!')
+
+
 
     """
     new_result_body = NewResultBody(
