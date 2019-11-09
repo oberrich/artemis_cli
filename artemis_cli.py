@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-# pip install pyyaml argparse requests json
+# pip install pyyaml argparse requests json typing
 import yaml
 import argparse
 import os
 import sys
 
-from detail.artemis_api import ArtemisAPI
+from detail.artemis_api import *
 
 parser = argparse.ArgumentParser(
     description='A command-line application for tutors to more productively grade programming excises on ArTEMiS')
@@ -27,7 +27,7 @@ download_repos_parser = sub_parsers.add_parser('downloadrepos',
                                                help='Download student exercise repositories')
 download_repos_parser.add_argument('-a',
                                    '--assignment',
-                                   metavar='',
+                                   metavar='assignment',
                                    nargs=1,
                                    help='The assignment to be processed (e.g. w01h01)')
 download_repos_parser.add_argument('-s',
@@ -36,12 +36,12 @@ download_repos_parser.add_argument('-s',
                                    nargs='+',
                                    help='The students TUM ids to be processed (e.g. ge36feg ba12sup, ...)')
 
-# TODO getscores
+# getscores
 get_scores_parser = sub_parsers.add_parser('getscores',
                                            help='Get scores for students\' assignments [not yet implemented]')
 get_scores_parser.add_argument('-a',
                                '--assignment',
-                               metavar='',
+                               metavar='assignment',
                                nargs=1,
                                help='The assignment to be processed (e.g. w01h01)')
 get_scores_parser.add_argument('-s',
@@ -50,21 +50,53 @@ get_scores_parser.add_argument('-s',
                                nargs='+',
                                help='The students TUM ids to be processed (e.g. ge36feg ba12sup, ...)')
 
-# TODO newresult
+# newresult
+# sytax:
+# -a w01h01 -s ab43cde
+# -score 80 -text "Gut gemacht "
+#   -positive "Kommentare" "Gute Dokumentation"
+#   -negative "Formatierung" "Bitte nutze Autoformat"
 new_result_parser = sub_parsers.add_parser('newresult',
                                            help='Post a new result for a student\'s assignment [not yet implemented]')
 new_result_parser.add_argument('-a',
                                '--assignment',
-                               metavar='',
+                               metavar='assignment',
+                               required=True,
                                nargs=1,
                                help='The assignment to be processed (e.g. w01h01)')
 new_result_parser.add_argument('-s',
                                '--student',
-                               metavar='tumId',
+                               required=True,
+                               metavar='tum_id',
                                nargs=1,
                                help='The students TUM id to be processed (e.g. ge36feg)')
+new_result_parser.add_argument('-score',
+                               metavar='score',
+                               required=True,
+                               type=int,
+                               nargs=1,
+                               help='The Score of the assignment (e.g. 80)')
+new_result_parser.add_argument('-text',
+                               required=True,
+                               metavar='result_text',
+                               nargs=1,
+                               help='The Result Text of the assignment (e.g. "Gut gemacht")')
+new_result_parser.add_argument('-pos',
+                               '--positive',
+                               metavar=('text', 'detail_text'),
+                               nargs=2,
+                               action='append',
+                               help='A positive feedback consisting of Text and Detail Text '
+                                    '(e.g. "Dokumentation" "Gute und präzise Kommentare")')
+new_result_parser.add_argument('-neg',
+                               '--negative',
+                               metavar=('text', 'detail_text'),
+                               nargs=2,
+                               action='append',
+                               help='A negative feedback consisting of Text and Detail Text '
+                                    '(e.g."Formatierung" "Bitte Autoformatierung benutzen")')
 
-# allows only one argument
+# allows only one of the specified arguments
 group = parser.add_mutually_exclusive_group()
 group.add_argument('-q', '--quiet', action='store_true', help='Print quiet')
 group.add_argument('-v', '--verbose', action='store_true', help='Print verbose')
