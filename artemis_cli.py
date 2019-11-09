@@ -15,11 +15,13 @@ from detail.artemis_api_payloads import NewResultBody
 def run_git(params, cwd=None):
     params = ['git'] + params
 
-    if args.verbose:
-        return subprocess.call(params, cwd=cwd)
-
     p = subprocess.Popen(params, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, _ = p.communicate()
+
+    if args.verbose and out:
+        print('Output of git ' + params[1] + ':')
+        print('  ' + out)
+
     return (p.returncode, out)
 
 def generate_gradebook(students):
@@ -87,17 +89,17 @@ def command_repos():
 
             run_git(['checkout', 'master'], cwd=repo_dir)
 
-            status = run_git(['pull'], cwd=repo_dir)
-
+            status, _ = run_git(['pull'], cwd=repo_dir)
+            if status != 0:
+                print('failed! `git pull` returned %d.' % status)
+                continue
         else:
             os.mkdir(repo_dir)
 
-            s = run_git(['clone', repo_url, repo_dir], cwd=repo_dir)
-            print(s)
-
-            if s != 0:
+            status, _ = run_git(['clone', repo_url, repo_dir], cwd=repo_dir)
+            if status != 0:
                 os.rmdir(repo_dir)
-                print('failed! `git clone` returned %d.' % s)
+                print('failed! `git clone` returned %d.' % status)
                 continue
 
         if not any(student in s for s in ['exercise', 'solution', 'tests']) and deadline is not None:
