@@ -8,6 +8,8 @@ import re
 import subprocess
 import typing
 
+from functools import partial
+
 from detail.artemis_api import ArtemisAPI
 from detail.arg_parser import ArgParser
 
@@ -129,32 +131,28 @@ def command_get_scores():
 
 
 def command_new_result():
-    # TODO feedback not required
+    if args.positive is None:
+        args.positive = []
 
-    positive_feedback_entries = []  # type: List[Dict[str, str]]
-    try:
-        if args.positive is not None:
-            for pos_feedback in args.positive:
-                text = pos_feedback[0]
-                detail_text = ''
-                if len(pos_feedback) == 2:
-                    detail_text = pos_feedback[1]
-                positive_feedback_entries.append(dict(text=text, detail_text=detail_text))
-    except IndexError:
-        raise Exception('Text for positive feedback is required (detail_text is optional, no extra arguments allowed)')
+    if args.negative is None:
+        args.negative = []
 
-    negative_feedback_entries = []  # type: List[Dict[str, str]]
-    try:
-        if args.negative is not None:
-            for neg_feedback in args.negative:
-                text = neg_feedback[0]
-                detail_text = ''
-                if len(neg_feedback) == 2:
-                    detail_text = neg_feedback[1]
-                positive_feedback_entries.append(dict(text=text, detail_text=detail_text))
-    except IndexError:
-        raise Exception('Text for negative feedback is required (detail_text is optional, no extra arguments allowed)')
+    any_invalid = lambda fs: any(len(f) != 1 and len(f) != 2 for f in fs)
 
+    if any_invalid(args.positive) or any_invalid(args.negative):
+        raise RuntimeError('Text for feedback is required (detail_text is optional, no extra arguments allowed)')
+
+    dict_mapper = lambda f, positive: {
+        'text': f[0],
+        'detailText': '' if len(f) == 1 else f[1],
+        'positive': positive
+    }
+
+    feedbacks = map(partial(dict_mapper, positive=True), args.positive)
+    feedbacks.extend([x for x in map(partial(dict_mapper, positive=False), args.negative)])
+
+    print(feedbacks)
+    """
     new_result_body = NewResultBody(
         score=args.score,
         result_text=args.text,
@@ -162,11 +160,11 @@ def command_new_result():
         negative_feedback_entries=negative_feedback_entries
     )
 
-    print('Chosen command: newresult not implemented yet but here\'s the data that would be sent to ArTEMiS:')
-
-    api.post_new_result(new_result_body=new_result_body,
+    api.post_new_result(student=args.student,
                         assignment=args.assignment,
-                        student=args.student)
+                        score=args.score,
+                        result_text=args.text)
+    """
     sys.exit(1)
 
 

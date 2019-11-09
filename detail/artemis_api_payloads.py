@@ -14,6 +14,8 @@ class NewResultBody(Serializable):
       {
         "score" : 85,
         "id": 191374,
+        "buildArtifact": false
+        "assessmentType": "MANUAL"
         "resultString": "Excellent!",
         "successful": "false",
         "feedbacks": [
@@ -32,6 +34,7 @@ class NewResultBody(Serializable):
 
     def __init__(self, score, result_text, positive_feedback_entries = None, negative_feedback_entries = None):
         # type: (int, str, List[Dict[str,str]], List[Dict[str,str]])
+
         self.score = score
         self.id = 12345  # TODO get right new result(?) id
         self.resultString = result_text

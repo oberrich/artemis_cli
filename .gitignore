@@ -4,7 +4,7 @@
 # Virtual environments
 venv/
 
-# SWaP files 
+# SWaP files
 *.swp
 
 # Configuration file
@@ -18,3 +18,7 @@ w[0-9]*h[0-9]*/
 # Exclude python cache folder
 __pycache__/
 *.pyc
+
+pgdp1920*/
+
+*.json

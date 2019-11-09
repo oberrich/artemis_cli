@@ -12,8 +12,8 @@ class ArtemisAPI:
 
         # make sure credentials were set
         if not self._creds['username'] or \
-            not self._creds['password'] or \
-            self._creds['password'] == 's3cur3_l337sp33k_p4zzw0rd':
+           not self._creds['password'] or \
+               self._creds['password'] == 's3cur3_l337sp33k_p4zzw0rd':
             raise RuntimeError('Artemis credentials required: Enter your username and password into `config.yml`')
 
         # create session and set headers and cookies
@@ -76,8 +76,10 @@ class ArtemisAPI:
 
     def post_new_result(self, new_result_body, assignment, student):
         # type: (NewResultBody, str, str)
+        # result = self.__get('/courses/37/exercises/733/results?ratedOnly=true&withSubmissions=false&withAssessors=false')
+        result = self.__get('/participations/192130')
 
-        print(new_result_body.serialize())
+        print(json.dumps(result, indent=4, sort_keys=True))
 
         # TODO post result via Artemis api, use assignment and student vars if necessary
         # self.__post(route=?, data=data)
