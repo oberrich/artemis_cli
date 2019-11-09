@@ -3,16 +3,17 @@ import json
 
 from detail.artemis_api_payloads import *
 
+
 class ArtemisAPI:
     def __init__(self, cfg):
         self._base_url = cfg['base_url']
-        self._course   = cfg['course']
-        self._creds    = cfg['credentials']
+        self._course = cfg['course']
+        self._creds = cfg['credentials']
 
         # make sure credentials were set
         if not self._creds['username'] or \
-           not self._creds['password'] or \
-               self._creds['password'] == 's3cur3_l337sp33k_p4zzw0rd':
+            not self._creds['password'] or \
+            self._creds['password'] == 's3cur3_l337sp33k_p4zzw0rd':
             raise RuntimeError('Artemis credentials required: Enter your username and password into `config.yml`')
 
         # create session and set headers and cookies
