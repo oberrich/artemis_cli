@@ -42,7 +42,7 @@ class NewResultBody:
                  negative_feedback_entries: List[Dict[str, str]] = None):
         self.score = score
         self.id = 12345  # TODO get right new result(?) id
-        self.result_String = result_text
+        self.resultString = result_text
         self.successful = True if score == 100 else False
         self.feedbacks: List[FeedbackBody] = []
         if positive_feedback_entries is not None:
@@ -64,6 +64,7 @@ class FeedbackBody:
         self.credits = 0            # default
         self.type = 'MANUAL'        # default
         self.text = text
+        self.detailText = detail_text
         self.referenceId = None     # default
         self.referenceType = None   # default
         self.positive = positive
