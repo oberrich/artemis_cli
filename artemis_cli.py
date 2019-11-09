@@ -129,7 +129,7 @@ def command_new_result():
 
     feedbacks = list(map(partial(dict_mapper, positive=True), args.positive))
     # and combine positive and negative feedbacks
-    feedbacks.extend([x for x in map(partial(dict_mapper, positive=False), args.negative)])
+    feedbacks.extend([x for x in list(map(partial(dict_mapper, positive=False), args.negative))])
 
     print('Fetching results for all students, this may take a few seconds...')
     results = api.get_results(api.get_exercise_id(args.exercise))

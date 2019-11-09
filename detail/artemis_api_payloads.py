@@ -17,7 +17,7 @@ class ManualResultBody(Serializable):
         self.resultString = text
         self.successful = True if score == 100 else False
         self.participation = participation
-        self.feedbacks = map(lambda f: FeedbackBody(f), feedbacks)
+        self.feedbacks = list(map(lambda f: FeedbackBody(f), feedbacks))
 
 
 class FeedbackBody(Serializable):
