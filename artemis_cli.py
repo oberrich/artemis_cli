@@ -6,7 +6,7 @@ import os
 import sys
 import re
 import subprocess
-import typing
+from typing import List, Dict
 
 from detail.artemis_api import ArtemisAPI
 from detail.arg_parser import ArgParser
