@@ -36,14 +36,17 @@ def command_repos():
             raise RuntimeError('Assignment name doesn\'t match the shortName convention of PGdP course')
 
         if not re.match(regex % ('', ''), assignment):
-            print('Warning: Usually shortNames for exercises follow the convention "w01h01", find the shortName on ArTEMiS if pulling the repos fails')
+            print('Warning: Usually shortNames for exercises follow the convention "w01h01", you can find the correct shortName on ArTEMiS if pulling the repos fails')
 
     students = args.students
     # remove whitespaces, commas and duplicates
     students = list(set(filter(lambda s: s, [s.replace(' ', '').replace(',', '') for s in students])))
 
     exercise = api.get_exercise(assignment)
-    deadline = None if exercise is None else api.get_deadline(exercise)
+    if exercise is None:
+        raise RuntimeError('Exercise doesn\'t exist, you can find the correct shortName on ArTEMiS')
+
+    deadline = api.get_deadline(exercise)
 
     num_students = len(students)
 
@@ -54,7 +57,10 @@ def command_repos():
 
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
-    print('Fetching %s assignment %s for student%s.' % (course_name, assignment, '' if num_students == 1 else 's'))
+    print('Fetching %s/%s@{%s} for %d student%s.\n' % (course_name, assignment, str(deadline),
+        num_students, '' if num_students == 1 else 's'))
+
+    num_succeeded = 0
 
     for student in students:
         sys.stdout.write('Fetching assigment for %s... ' % student)
@@ -65,6 +71,13 @@ def command_repos():
 
         # TODO create a folder structure unless flatten option in config is set
         repo_dir = os.path.join(script_dir, repo_name)
+
+        if os.path.exists(repo_dir):
+            if not os.path.isdir(repo_dir):
+                print('failed! Directory where student\'s repository is supposed to be clone into cannot be created because a non-directory file with the same name already exists.')
+                continue
+            elif not os.listdir(repo_dir):
+                os.rmdir(repo_dir)
 
         if os.path.exists(repo_dir):
             # directory for repo already exists
@@ -85,16 +98,15 @@ def command_repos():
                 print('failed! `git clone` returned %d.' % status)
                 continue
 
-            if not any(student in s for s in ['exercise', 'solution', 'tests']):
-                # TODO checkout master@deadline
-                # git checkout `git rev-list -1 --before="$due_date" master`
-                pass
+        if not any(student in s for s in ['exercise', 'solution', 'tests']) and deadline is not None:
+            run_git(['checkout', '`git rev-list -1 --before="%s" master`' % deadline], cwd=repo_dir)
 
-            # set push url to `forbidden` to avoid accidental pushes into student repository
-            run_git(['remote', 'set-url', '--push', 'origin', 'forbidden'], cwd=repo_dir)
+        run_git(['remote', 'set-url', '--push', 'origin', 'forbidden'], cwd=repo_dir)
 
+        num_succeeded += 1
         print("ok!")
-        pass
+
+    print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (num_succeeded, len(students), float(num_succeeded) / len(students) * 100.))
 
 def command_get_scores():
     print('Chosen command: getscores not implemented yet.')

@@ -58,19 +58,19 @@ class ArtemisAPI:
         if 'id_token' not in resp.keys():
             raise RuntimeError('Failed to authenticate!\nExpected field \'id_token\' in\n  ' + str(resp))
 
-        self.session.auth = ('Bearer', resp['id_token'])
+        self.session.headers.update({'Authorization': 'Bearer ' + resp['id_token']})
 
-    def get_exercise(short_name):
-        exercises = self.__get('/courses/%d/programming-exercises/' % course_id)
+    def get_exercise(self, short_name):
+        exercises = self.__get('/courses/%d/programming-exercises/' % self._course['id'])
 
         for exercise in exercises:
             if exercise['shortName'] == short_name:
                 return exercise
         return None
 
-    def get_due_date(exercise):
-        if 'dueDate' in attrs:
-            return attrs['dueDate']
+    def get_deadline(self, exercise):
+        if 'dueDate' in exercise:
+            return exercise['dueDate']
         return None
 
     def post_new_result(self, new_result_body, assignment, student):
