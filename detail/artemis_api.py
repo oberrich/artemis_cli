@@ -2,8 +2,6 @@ import requests
 import json
 
 from json import JSONEncoder  # somehow necessary
-from typing import List, Dict
-
 
 class DictEncoder(JSONEncoder):
     '''
@@ -35,16 +33,13 @@ class NewResultBody:
       }
     '''
 
-    def __init__(self,
-                 score: int,
-                 result_text: str,
-                 positive_feedback_entries: List[Dict[str, str]] = None,
-                 negative_feedback_entries: List[Dict[str, str]] = None):
+    def __init__(self, score, result_text, positive_feedback_entries = None, negative_feedback_entries = None):
+        # type: (int, str, List[Dict[str,str]], List[Dict[str,str]])
         self.score = score
         self.id = 12345  # TODO get right new result(?) id
         self.resultString = result_text
         self.successful = True if score == 100 else False
-        self.feedbacks: List[FeedbackBody] = []
+        self.feedbacks = [] # type: List[FeedbackBody]
         if positive_feedback_entries is not None:
             for pos_feedback in positive_feedback_entries:
                 pos_feedback_body = FeedbackBody(positive=True,
@@ -60,7 +55,8 @@ class NewResultBody:
 
 
 class FeedbackBody:
-    def __init__(self, positive: bool, text: str, detail_text: str):
+    def __init__(self, positive, text, detail_text):
+        # type: (bool, str, str)
         self.credits = 0            # default
         self.type = 'MANUAL'        # default
         self.text = text
@@ -127,7 +123,8 @@ class ArtemisAPI:
 
         self.session.auth = ('Bearer', resp['id_token'])
 
-    def post_new_result(self, new_result_body: NewResultBody, assignment: str, student: str):
+    def post_new_result(self, new_result_body, assignment, student):
+        # type: (NewResultBody, str, str)
 
         data = json.dumps(new_result_body,
                           cls=DictEncoder,

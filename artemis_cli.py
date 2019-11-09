@@ -87,7 +87,7 @@ new_result_parser.add_argument('-pos',
                                nargs=2,
                                action='append',
                                help='A positive feedback consisting of Text and Detail Text '
-                                    '(e.g. "Dokumentation" "Gute und präzise Kommentare")')
+                                    '(e.g. "Dokumentation" "Gute und akkurate Kommentare")')
 new_result_parser.add_argument('-neg',
                                '--negative',
                                metavar=('text', 'detail_text'),
@@ -108,18 +108,18 @@ with open('config.yml', 'r') as config_file:
 
 artemis = cfg['artemis']
 api = ArtemisAPI(artemis)
+
 bitbucket = cfg['bitbucket']['base_url']
 course_name = artemis['course']['name']
 
 
 def download_repos(quiet=False, verbose=False):
-    print('Fetching student assignments')
+    print('Fetching %s assignment %s for students...\n' % (assignment))
     students = args.students
     students.extend(['exercise', 'solution', 'tests'])
     assignment = args.assignment[0]  # is a list
 
     for student in students:
-
         # example repo url: https://bitbucket.ase.in.tum.de/scm/PGDP1920W01P01/pgdp1920w01p01-ab42cde.git
         print('Fetching assigment %s for %s...' % (assignment, student))
 
@@ -130,6 +130,7 @@ def download_repos(quiet=False, verbose=False):
 
         if not os.path.exists(local_repo):
             os.mkdir(local_repo)
+
         os.chdir(local_repo)
 
         repo_url = os.path.join(bitbucket, 'scm', course_assignment, remote_repo)
@@ -147,11 +148,11 @@ def get_scores(quiet=False, verbose=False):
 
 def new_result(quiet=False, verbose=False):
 
-    positive_feedback_entries: List[Dict[str, str]] = []
+    positive_feedback_entries = [] # type: List[Dict[str, str]]
     if args.positive is not None:
         for pos_feedback in args.positive:
             positive_feedback_entries.append(dict(text=pos_feedback[0], detail_text=pos_feedback[1]))
-    negative_feedback_entries: List[Dict[str, str]] = []
+    negative_feedback_entries = [] # type: List[Dict[str, str]]
     if args.negative is not None:
         for neg_feedback in args.negative:
             negative_feedback_entries.append(dict(text=neg_feedback[0], detail_text=neg_feedback[1]))
