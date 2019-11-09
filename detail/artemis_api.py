@@ -41,11 +41,11 @@ class ArtemisAPI:
         self.__authenticate()
 
     def __post(self, route, body):
-        # type: (string, Serializable) -> Dict
+        # type: (str, Serializable) -> dict
         return self.session.post(self._base_url + route, data=body.serialize()).json()
 
     def __get(self, route):
-        # type: (string) -> Dict
+        # type: (str) -> dict
         return self.session.get(self._base_url + route).json()
 
     def __authenticate(self):
@@ -75,7 +75,7 @@ class ArtemisAPI:
         return None
 
     def post_new_result(self, new_result_body, assignment, student):
-        # type: (NewResultBody, str, str)
+        # type: (NewResultBody, str, str) -> None
 
         print(new_result_body.serialize())
 

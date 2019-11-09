@@ -6,7 +6,6 @@ import os
 import sys
 import re
 import subprocess
-from typing import List, Dict
 
 from detail.artemis_api import ArtemisAPI
 from detail.arg_parser import ArgParser
@@ -131,7 +130,7 @@ def command_get_scores():
 def command_new_result():
     # TODO feedback not required
 
-    positive_feedback_entries = []  # type: List[Dict[str, str]]
+    positive_feedback_entries = []  # type: [dict]
     try:
         if args.positive is not None:
             for pos_feedback in args.positive:
@@ -143,7 +142,7 @@ def command_new_result():
     except IndexError:
         raise Exception('Text for positive feedback is required (detail_text is optional, no extra arguments allowed)')
 
-    negative_feedback_entries = []  # type: List[Dict[str, str]]
+    negative_feedback_entries = []  # type: [dict]
     try:
         if args.negative is not None:
             for neg_feedback in args.negative:
