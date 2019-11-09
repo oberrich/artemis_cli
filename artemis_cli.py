@@ -6,11 +6,13 @@ import os
 import sys
 import re
 import subprocess
+import typing
 
 from detail.artemis_api import ArtemisAPI
 from detail.arg_parser import ArgParser
 
 from detail.artemis_api_payloads import NewResultBody
+
 
 def run_git(params, cwd=None):
     params = ['git'] + params
