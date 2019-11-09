@@ -163,11 +163,11 @@ def new_result(quiet=False, verbose=False):
         negative_feedback_entries=negative_feedback_entries
     )
 
+    print('Chosen command: newresult not implemented yet but here\'s the data that would be sent to ArTEMiS:')
+
     api.post_new_result(new_result_body=new_result_body,
                         assignment=args.assignment[0],
                         student=args.student[0])
-
-    print('Chosen command: newresult not implemented yet.')
     sys.exit(1)
 
 
