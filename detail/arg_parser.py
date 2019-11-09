@@ -56,7 +56,7 @@ class ArgParser(argparse.ArgumentParser):
         result_parser.add_argument('-s', '--student',
                                    required=True,
                                    metavar='tum_id',
-                                   help='The students TUM id to be processed (e.g. ge36feg)')
+                                   help='The students TUM id to be processed (e.g. ge42abc')
 
         result_parser.add_argument('-score',
                                    metavar='score',
