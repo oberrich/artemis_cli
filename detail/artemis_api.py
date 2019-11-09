@@ -1,6 +1,18 @@
 import requests
 import json
 
+from json import JSONEncoder  # somehow necessary
+from typing import List, Dict
+
+
+class DictEncoder(JSONEncoder):
+    '''
+    wtf Python that I have to implement this myself
+    '''
+    def default(self, o):
+        return o.__dict__
+
+
 class NewResultBody:
     '''
     Artemis api new result schema:
@@ -113,3 +125,14 @@ class ArtemisAPI:
             raise RuntimeError('Failed to authenticate!\nExpected field \'id_token\' in\n  ' + str(resp))
 
         self.session.auth = ('Bearer', resp['id_token'])
+
+    def post_new_result(self, new_result_body: NewResultBody, assignment: str, student: str):
+
+        data = json.dumps(new_result_body,
+                          cls=DictEncoder,
+                          indent=4,
+                          separators=(',', ': '))
+        print(data)
+
+        # TODO post result via Artemis api, use assignment and student vars if necessary
+        # self.__request_post(route=?, data=data)
