@@ -55,16 +55,16 @@ def command_repos():
     if num_students == 0:
         raise RuntimeError('No valid student name in args.students')
 
-    students.extend(['exercise', 'solution', 'tests'])
-
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
-    print('Fetching %s/%s@{%s} for %d student%s.\n' % (course_name, assignment, str(deadline),
+    print('Fetching %s-%s@{%s} for %d student%s.\n' % (course_name, assignment, str(deadline),
         num_students, '' if num_students == 1 else 's'))
+
+    special_repos = ['exercise', 'solution', 'tests']
 
     num_succeeded = 0
 
-    for student in students:
+    for student in special_repos + students:
         sys.stdout.write('Fetching assigment for %s... ' % student)
         sys.stdout.flush()
 
@@ -111,7 +111,8 @@ def command_repos():
         num_succeeded += 1
         print("ok!")
 
-    print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (num_succeeded, len(students), float(num_succeeded) / len(students) * 100.))
+    num_repos = len(students) + len(special_repos)
+    print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
 
 def command_get_scores():
     print('Chosen command: getscores not implemented yet.')
