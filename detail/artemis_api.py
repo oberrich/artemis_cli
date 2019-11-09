@@ -136,4 +136,4 @@ class ArtemisAPI:
         print(new_result_body.serialize())
 
         # TODO post result via Artemis api, use assignment and student vars if necessary
-        # self.__request_post(route=?, data=data)
+        # self.__post(route=?, data=data)

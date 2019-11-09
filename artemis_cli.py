@@ -28,7 +28,7 @@ download_repos_parser = sub_parsers.add_parser('downloadrepos',
 download_repos_parser.add_argument('-a',
                                    '--assignment',
                                    metavar='assignment',
-                                   nargs=1,
+                                   nargs=None,
                                    help='The assignment to be processed (e.g. w01h01)')
 download_repos_parser.add_argument('-s',
                                    '--students',
@@ -42,7 +42,7 @@ get_scores_parser = sub_parsers.add_parser('getscores',
 get_scores_parser.add_argument('-a',
                                '--assignment',
                                metavar='assignment',
-                               nargs=1,
+                               nargs=None,
                                help='The assignment to be processed (e.g. w01h01)')
 get_scores_parser.add_argument('-s',
                                '--students',
@@ -62,24 +62,24 @@ new_result_parser.add_argument('-a',
                                '--assignment',
                                metavar='assignment',
                                required=True,
-                               nargs=1,
+                               nargs=None,
                                help='The assignment to be processed (e.g. w01h01)')
 new_result_parser.add_argument('-s',
                                '--student',
                                required=True,
                                metavar='tum_id',
-                               nargs=1,
+                               nargs=None,
                                help='The students TUM id to be processed (e.g. ge36feg)')
 new_result_parser.add_argument('-score',
                                metavar='score',
                                required=True,
                                type=int,
-                               nargs=1,
+                               nargs=None,
                                help='The Score of the assignment (e.g. 80)')
 new_result_parser.add_argument('-text',
                                required=True,
                                metavar='result_text',
-                               nargs=1,
+                               nargs=None,
                                help='The Result Text of the assignment (e.g. "Gut gemacht")')
 new_result_parser.add_argument('-pos',
                                '--positive',
@@ -114,14 +114,19 @@ course_name = artemis['course']['name']
 
 
 def download_repos(quiet=False, verbose=False):
-    print('Fetching %s assignment %s for students...\n' % (assignment))
+    print('Fetching %s assignment %s for students...\n' % (course_name, assignment))
+
     students = args.students
     students.extend(['exercise', 'solution', 'tests'])
-    assignment = args.assignment[0]  # is a list
+
+    assignment = args.assignment
 
     for student in students:
+        # TODO unflatten project structure, add option to flatten it
+        # TODO add option to customize path to root folder
+
         # example repo url: https://bitbucket.ase.in.tum.de/scm/PGDP1920W01P01/pgdp1920w01p01-ab42cde.git
-        print('Fetching assigment %s for %s...' % (assignment, student))
+        print('Fetching assigment for %s...' % (assignment, student))
 
         course_assignment = course_name + assignment
         remote_repo = course_name + '-' + student + '.git'
@@ -158,8 +163,8 @@ def new_result(quiet=False, verbose=False):
             negative_feedback_entries.append(dict(text=neg_feedback[0], detail_text=neg_feedback[1]))
 
     new_result_body = NewResultBody(
-        score=args.score[0],
-        result_text=args.text[0],
+        score=args.score,
+        result_text=args.text,
         positive_feedback_entries=positive_feedback_entries,
         negative_feedback_entries=negative_feedback_entries
     )
@@ -167,8 +172,8 @@ def new_result(quiet=False, verbose=False):
     print('Chosen command: newresult not implemented yet but here\'s the data that would be sent to ArTEMiS:')
 
     api.post_new_result(new_result_body=new_result_body,
-                        assignment=args.assignment[0],
-                        student=args.student[0])
+                        assignment=args.assignment,
+                        student=args.student)
     sys.exit(1)
 
 
