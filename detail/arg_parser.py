@@ -56,7 +56,7 @@ class ArgParser(argparse.ArgumentParser):
         result_parser.add_argument('-s', '--student',
                                    required=True,
                                    metavar='tum_id',
-                                   help='The students TUM id to be processed (e.g. ge36feg)')
+                                   help='The students TUM id to be processed (e.g. ge42abc')
 
         result_parser.add_argument('-score',
                                    metavar='score',
@@ -73,15 +73,15 @@ class ArgParser(argparse.ArgumentParser):
                                    metavar=('text', 'detail_text'),
                                    nargs='+',  # at least one
                                    action='append',
-                                   help='A positive feedback consisting of Text and Detail Text '
-                                        '(e.g. "Dokumentation" "Gute und akkurate Kommentare")')
+                                   help='A positive feedback consisting of Text and optionally Detail Text '
+                                        '(e.g. "Dokumentation" ["Gute und akkurate Kommentare"])')
 
         result_parser.add_argument('-neg', '--negative',
                                    metavar=('text', 'detail_text'),
                                    nargs='+',  # at least one
                                    action='append',
-                                   help='A negative feedback consisting of Text and Detail Text '
-                                        '(e.g."Formatierung" "Bitte Autoformatierung benutzen")')
+                                   help='A negative feedback consisting of Text and optionally Detail Text '
+                                        '(e.g."Formatierung" ["Bitte Autoformatierung benutzen"])')
 
         # allows only one of the specified arguments
         group = self.add_mutually_exclusive_group()
