@@ -231,6 +231,8 @@ def main():
     # instantiate the artemis api client
     api = ArtemisAPI(artemis)
 
+    # for Python 2.7 compatibility: FileNotFoundError throws a NameError and when the file
+    # does not exist, `open` throws an IOError instead of a FileNotFoundError
     if args.command == 'grades':
         args.gradebook = None
         try:
