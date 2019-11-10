@@ -1,5 +1,4 @@
 import requests
-import json
 
 from detail.artemis_api_payloads import *
 
