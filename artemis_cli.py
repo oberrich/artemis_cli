@@ -87,7 +87,7 @@ def command_repos():
         sys.stdout.flush()
 
         repo_name = "%s%s-%s" % (course_name, assignment, student)
-        repo_url = os.path.join(bitbucket, 'scm', course_name + assignment, repo_name + '.git')
+        repo_url = "/".join([bitbucket, 'scm', course_name + assignment, repo_name + '.git'])
 
         repo_dir = os.path.join(assignment_dir, student)
 
