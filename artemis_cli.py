@@ -8,6 +8,7 @@ import re
 import subprocess
 
 from functools import partial
+from xml.etree import ElementTree
 
 from detail.artemis_api import ArtemisAPI
 from detail.arg_parser import ArgParser
@@ -130,12 +131,16 @@ def command_repos():
         num_succeeded += 1
         print('ok!')
 
-        # TODO add student id to projectDescription/name in `.project` file (#5)
-        #  - find .project file
-        #  - build doc from xml file
-        #  - find node with projectDescription/name
-        #  - append student id
-        #  - overwrite/ save doc in .project file
+        # add student id to projectDescription/name in .project file to allow repo batch import into Eclipse
+        # tests is a Maven Project (no .project file), solution already has 'Solution' attached to name
+        if student not in ['tests', 'solution']:
+            project_file_dir = os.path.abspath(os.path.join(repo_dir, '.project'))
+            if os.path.exists(project_file_dir):
+                et = ElementTree.parse(project_file_dir)
+                et.getroot().find('name').text += ' ' + student
+                et.write(project_file_dir)
+            else:
+                print('No .project file for %s found. Double-check the repository' % repo_dir)
 
     num_repos = num_students + len(special_repos)
     print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
