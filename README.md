@@ -18,7 +18,7 @@ exercises in order to grade them. **This script assists the relevant steps in th
 1. Add your ArTEMiS credentials (username and password) into `config.yml`
    * Remember to untrack the changes to this file before redistributing: `git update-index --assume-unchanged config.yml`
 2. Make the script executable: `chmod +x artemis_cli.py`
-3. Install dependencies via `pip install pyyaml argparse requests json`
+3. Install dependencies via `pip install pyyaml argparse requests`
 
 Run the script via `./artemis_cli.py <command>`
 
