@@ -1,10 +1,8 @@
 # artemis-cli
 A command-line application for tutors to more productively grade programming excises on ArTEMiS
 
-[![forthebadge](https://forthebadge.com/images/badges/fuck-it-ship-it.svg)](https://forthebadge.com)
-
 ## Beta notice
-[![forthebadge](https://forthebadge.com/images/badges/60-percent-of-the-time-works-every-time.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/fuck-it-ship-it.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/60-percent-of-the-time-works-every-time.svg)](https://forthebadge.com)
 
 This program is still in beta and hasn't been thoroughly tested yet, make sure your grades were actually submitted properly.
 
