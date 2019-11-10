@@ -53,7 +53,7 @@ def generate_gradebook(dir, students):
 
 
 def command_repos():
-    # TODO apply sanitization in main function
+    # TODO check if paths with spaces are working properly
     assignment = args.assignment
     deadline = api.get_deadline(args.exercise)
 

@@ -44,10 +44,6 @@ class ArtemisAPI:
         # type: (str, Serializable) -> dict
         return self.session.post(self._base_url + route, data=body.serialize()).json()
 
-    def __put(self, route, body):
-        # type: (str, Serializable) -> dict
-        return self.session.put(self._base_url + route, data=body.serialize()).json()
-
     def __get(self, route):
         # type: (str) -> dict
         return self.session.get(self._base_url + route).json()
