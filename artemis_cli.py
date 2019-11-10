@@ -156,6 +156,7 @@ def command_grades():
 
     print('Done!')
 
+
 def command_get_scores():
     print('Chosen command: getscores not implemented yet.')
     sys.exit(1)
@@ -283,10 +284,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# TODO finish implementing API in detail/artemis_api.py
-# TODO port backup/artemis-cli.sh to python
-# TODO create symlink to tests repository for every student's submission to
-#      make testing a lot easier
-# TODO add feature to upload grades
-# TODO create an eclipse/intellij project containing all student's submissions)
