@@ -130,6 +130,13 @@ def command_repos():
         num_succeeded += 1
         print('ok!')
 
+        # TODO add student id to projectDescription/name in `.project` file (#5)
+        #  - find .project file
+        #  - build doc from xml file
+        #  - find node with projectDescription/name
+        #  - append student id
+        #  - overwrite/ save doc in .project file
+
     num_repos = num_students + len(special_repos)
     print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
 
