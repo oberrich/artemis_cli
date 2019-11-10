@@ -233,10 +233,14 @@ def main():
 
     if args.command == 'grades':
         args.gradebook = None
+        try:
+            FileNotFoundError
+        except NameError:
+            FileNotFoundError = IOError
 
         try:
-            with open(args.gradebook_file, 'r') as file:
-                args.gradebook = yaml.load(file)
+            with open(args.file, 'r') as file:
+                args.gradebook = yaml.load(file, Loader=yaml.SafeLoader)
         except FileNotFoundError as err:
             print(err)
             print('Example for gradebook path pgdp1920/w01h01/gradebook.yml')
