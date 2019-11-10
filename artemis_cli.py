@@ -86,8 +86,8 @@ def command_repos():
         sys.stdout.write('Fetching assigment for %s... ' % student)
         sys.stdout.flush()
 
-        repo_name = "%s%s-%s" % (course_name, assignment, student)
-        repo_url = "/".join([bitbucket, 'scm', course_name + assignment, repo_name + '.git'])
+        repo_name = '%s%s-%s' % (course_name, assignment, student)
+        repo_url = '/'.join([bitbucket, 'scm', course_name + assignment, repo_name + '.git'])
 
         repo_dir = os.path.join(assignment_dir, student)
 
@@ -128,7 +128,7 @@ def command_repos():
         run_git(['remote', 'set-url', '--push', 'origin', 'forbidden'], cwd=repo_dir)
 
         num_succeeded += 1
-        print("ok!")
+        print('ok!')
 
     num_repos = num_students + len(special_repos)
     print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
@@ -250,8 +250,8 @@ def main():
         args.students = list(map(lambda s: s['name'], args.gradebook['assessments']))
 
     # verify course name against patterns
-    if course_name == "pgdp1920":
-        regex = "^w[0-9][0-9]%s[hp][0-9][0-9]%s$"
+    if course_name == 'pgdp1920':
+        regex = '^w[0-9][0-9]%s[hp][0-9][0-9]%s$'
 
         if not re.match(regex % ('?', '?'), args.assignment):
             raise RuntimeError('Assignment name doesn\'t match the shortName convention of PGdP course')
@@ -286,5 +286,5 @@ def main():
     dispatch[args.command]()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
