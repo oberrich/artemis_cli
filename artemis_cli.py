@@ -345,8 +345,8 @@ def main():
 
     if args.command != 'results' or hasattr(args, 'students'):
         # by removing whitespaces, commas and duplicates
-        # TODO sort after converting to set to preserve alphabetical order
         args.students = list(set(filter(lambda s: s, [s.replace(' ', '').replace(',', '') for s in args.students])))
+        args.students.sort()
 
         # raise if no well-formed students have been passed to args
         if not args.students:
