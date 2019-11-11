@@ -2,7 +2,6 @@ import requests
 
 from detail.artemis_api_payloads import *
 
-
 class ArtemisAPI:
     def __init__(self, cfg):
         self._base_url = cfg['base_url']
@@ -77,6 +76,7 @@ class ArtemisAPI:
         return exercise['dueDate'] if 'dueDate' in exercise else None
 
     def get_results(self, exercise_id, students=None):
+        # type: (id, List[str]) -> List[Dict]
         results = self.__get('/courses/%d/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=false' % (self._course['id'], exercise_id))
         if students:
             results = list(filter(lambda r: r['participation']['student']['login'] in students, results))
@@ -86,14 +86,16 @@ class ArtemisAPI:
         return self.__get('/results/%d/details' % result_id)
 
     def get_participation(self, participation_id):
+        # type: (int) -> Dict
         return self.__get('/participations/%d' % participation_id)
 
     @staticmethod
     def get_participation_id(participation):
+        # type: (Dict) -> int
         return participation['id'] if 'id' in participation else None
 
     def post_new_result(self, participation_id, score, text, feedbacks):
-        # type: (str, int, str, List[Dict[str, str, str, bool]]) -> None
+        # type: (int, int, str, List[Dict[str, str, bool]]) -> None
         participation = self.get_participation(participation_id)
         body = ManualResultBody(score, text, feedbacks, participation)
         self.__post('/manual-results', body)
