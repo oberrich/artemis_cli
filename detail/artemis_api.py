@@ -42,6 +42,10 @@ class ArtemisAPI:
         # type: (str, Serializable) -> Dict
         return self.session.post(self._base_url + route, data=body.serialize()).json()
 
+    def __put(self, route, body):
+        # type: (str, Serializable) -> Dict
+        return self.session.put(self._base_url + route, data=body.serialize()).json()
+
     def __get(self, route):
         # type: (str) -> Dict
         return self.session.get(self._base_url + route).json()
@@ -98,8 +102,9 @@ class ArtemisAPI:
         # type: (int) -> Dict
         return self.__get('/participations/%d' % participation_id)
 
-    def post_new_result(self, participation_id, score, text, feedbacks):
-        # type: (int, int, str, List[Dict[str, str, bool]]) -> None
-        participation = self.get_participation(participation_id)
-        body = ManualResultBody(score, text, feedbacks, participation)
-        self.__post('/manual-results', body)
+    def post_new_result(self, result, score, text, feedbacks):
+        # type: (Dict, int, str, List[Dict[str, str, bool]]) -> None
+        participation = self.get_participation(result['participation']['id'])
+        body = ManualResultBody(result, score, text, feedbacks, participation)
+        print(json.dumps(self.__put('/manual-results', body), indent=4))
+

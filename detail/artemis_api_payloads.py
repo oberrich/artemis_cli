@@ -15,8 +15,11 @@ class Serializable:
 
 
 class ManualResultBody(Serializable):
-    def __init__(self, score, text, feedbacks, participation):
-        # type: (int, str, List[Dict[str,str,bool]], Dict) -> None
+    def __init__(self, result, score, text, feedbacks, participation):
+        # type: (Dict, int, str, List[Dict[str,str,bool]], Dict) -> None
+        [setattr(self, k, v) for k, v in result.items()]
+        self.id = result['id']
+        self.assessmentType = "MANUAL"
         self.buildArtifact = False
         self.score = score
         self.resultString = text
@@ -24,6 +27,7 @@ class ManualResultBody(Serializable):
         self.participation = participation
         self.completionDate = datetime.datetime.utcnow().isoformat()[:-3] + 'Z'
         self.feedbacks = list(map(lambda f: FeedbackBody(f), feedbacks))
+        self.hasFeedback = True if self.feedbacks else False
 
 
 class FeedbackBody(Serializable):

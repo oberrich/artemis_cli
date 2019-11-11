@@ -8,7 +8,7 @@ import os
 import sys
 import re
 import subprocess
-import unicodecsv as csv
+import csv
 import json
 
 from functools import partial
@@ -194,9 +194,9 @@ def command_results():
 
     results = api.get_results(api.get_exercise_id(args.exercise), args.students)
 
-    with open('results.csv', 'w', encoding='utf-8') as csv_file:
+    with open('results.csv', 'w', newline='') as csv_file:
         fields = ['name', 'login', 'type', 'score', 'result', 'feedbacks', 'assessor_name', 'assessor_login', 'repo']
-        writer = csv.DictWriter(csv_file, fieldnames=fields, encoding='utf-8')
+        writer = csv.DictWriter(csv_file, fieldnames=fields)
         writer.writeheader()
 
         for result in results:
@@ -271,12 +271,12 @@ def command_grade(results=None):
         print('Fetching results for all students, this may take a few seconds...')
         results = api.get_results(api.get_exercise_id(args.exercise))
 
-    participations = [p['participation'] for p in results if p['participation']['student']['login'] == args.students[0]]
-    if not participations:
-        raise RuntimeError('No participations for any of the students')
+    student_result = [r for r in results if r['participation']['student']['login'] == args.students[0]]
+    if not student_result:
+        raise RuntimeError('No previous result for any of the students')
 
     print('Submitting feedback for student ' + args.students[0])
-    api.post_new_result(participations[0]['id'], args.score, args.text, feedbacks)
+    api.post_new_result(student_result[0], args.score, args.text, feedbacks)
 
     if not is_internal_use:
         print('Done!')
