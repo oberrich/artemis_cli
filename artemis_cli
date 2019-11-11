@@ -286,7 +286,7 @@ def main():
         cfg = yaml.safe_load(config_file)
 
     # alias commonly used config fields
-    # general = cfg['general']
+    general = cfg['general']
     artemis = cfg['artemis']
     bitbucket = cfg['bitbucket']['base_url']
     course_name = artemis['course']['name']

@@ -5,9 +5,12 @@ artemis:
   base_url: 'https://artemis.ase.in.tum.de/api'
 
   credentials:
-    username: 'ge36moy'
+    username: 'ge42abc'
     password: ''
-  
+
   course:
     id: 37
     name: 'pgdp1920'
+
+general:
+  fix_eclipse_import: True
