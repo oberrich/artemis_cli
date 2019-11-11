@@ -39,23 +39,23 @@ def generate_gradebook(gradebook_dir, students):
               'the repos command again if you want to generate a new gradebook.')
     else:
         assessments = ["""
-        {
-          name: %s,
-          score: 100,
-          text: '',
-          negative: [
-            ['', ''],
-            ['', '']
-          ],
-          positive: [
-            ['', '']
-          ]
-        },""" % s for s in students]
+  {
+    name: %s,
+    score: 100,
+    text: '',
+    negative: [
+      ['', ''],
+      ['', '']
+    ],
+    positive: [
+      ['', '']
+    ]
+  },""" % s for s in students]
 
         gradebook = """{
-    assignment: %s,
-    assessments: [%s
-    ]
+  assignment: %s,
+  assessments: [%s
+  ]
 }""" % (args.assignment, ''.join(assessments))
 
         with open(filename, 'w') as file:
@@ -345,6 +345,7 @@ def main():
 
     if args.command != 'results' or hasattr(args, 'students'):
         # by removing whitespaces, commas and duplicates
+        # TODO sort after converting to set to preserve alphabetical order
         args.students = list(set(filter(lambda s: s, [s.replace(' ', '').replace(',', '') for s in args.students])))
 
         # raise if no well-formed students have been passed to args
