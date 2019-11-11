@@ -1,3 +1,7 @@
+general:
+  fix_eclipse_import: True
+  root_dir: '/not/implemented/yet'
+
 bitbucket:
   base_url: 'https://bitbucket.ase.in.tum.de'
 
@@ -11,6 +15,3 @@ artemis:
   course:
     id: 37
     name: 'pgdp1920'
-
-general:
-  fix_eclipse_import: True
