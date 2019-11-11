@@ -82,6 +82,9 @@ class ArtemisAPI:
             results = list(filter(lambda r: r['participation']['student']['login'] in students, results))
         return results
 
+    def get_result_details(self, result_id):
+        return self.__get('/results/%d/details' % result_id)
+
     def get_participation(self, participation_id):
         return self.__get('/participations/%d' % participation_id)
 

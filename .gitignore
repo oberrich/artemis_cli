@@ -22,3 +22,6 @@ __pycache__/
 pgdp1920*/
 
 *.json
+
+.~lock*
+*.csv
