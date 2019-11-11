@@ -28,7 +28,7 @@ class ManualResultBody(Serializable):
 
 class FeedbackBody(Serializable):
     def __init__(self, feedback):
-        # type: (List[Dict[str, str, bool]]) -> None
+        # type: (Dict[str, str, bool]) -> None
         self.credits = 0            # default
         self.type = 'MANUAL'        # default
         self.referenceId = None     # default

@@ -2,16 +2,16 @@ import requests
 
 from detail.artemis_api_payloads import *
 
+
 class ArtemisAPI:
     def __init__(self, cfg):
+        # type: (Dict) -> None
         self._base_url = cfg['base_url']
         self._course = cfg['course']
         self._creds = cfg['credentials']
 
         # make sure credentials were set
-        if not self._creds['username'] or \
-           not self._creds['password'] or \
-               self._creds['password'] == 's3cur3_l337sp33k_p4zzw0rd':
+        if not self._creds['username'] or not self._creds['password']:
             raise RuntimeError('Artemis credentials required: Enter your username and password into `config.yml`')
 
         # create session and set headers and cookies
@@ -39,11 +39,11 @@ class ArtemisAPI:
         self.__authenticate()
 
     def __post(self, route, body):
-        # type: (str, Serializable) -> dict
+        # type: (str, Serializable) -> Dict
         return self.session.post(self._base_url + route, data=body.serialize()).json()
 
     def __get(self, route):
-        # type: (str) -> dict
+        # type: (str) -> Dict
         return self.session.get(self._base_url + route).json()
 
     def __authenticate(self):
@@ -77,12 +77,15 @@ class ArtemisAPI:
 
     def get_results(self, exercise_id, students=None):
         # type: (id, List[str]) -> List[Dict]
-        results = self.__get('/courses/%d/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=false' % (self._course['id'], exercise_id))
+        results = self.__get(
+            '/courses/%d/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=false' % (
+            self._course['id'], exercise_id))
         if students:
             results = list(filter(lambda r: r['participation']['student']['login'] in students, results))
         return results
 
     def get_result_details(self, result_id):
+        # type: (int) -> Dict
         return self.__get('/results/%d/details' % result_id)
 
     def get_participation(self, participation_id):
