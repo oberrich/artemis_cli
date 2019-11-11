@@ -69,17 +69,23 @@ class ArtemisAPI:
 
     @staticmethod
     def get_exercise_id(exercise):
+        # type: (Dict) -> int
         return exercise['id'] if 'id' in exercise else None
 
     @staticmethod
     def get_deadline(exercise):
+        # type: (Dict) -> str
         return exercise['dueDate'] if 'dueDate' in exercise else None
+
+    @staticmethod
+    def get_participation_id(participation):
+        # type: (Dict) -> int
+        return participation['id'] if 'id' in participation else None
 
     def get_results(self, exercise_id, students=None):
         # type: (id, List[str]) -> List[Dict]
-        results = self.__get(
-            '/courses/%d/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=false' % (
-            self._course['id'], exercise_id))
+        results = self.__get('/courses/%d/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=false'
+                             % (self._course['id'], exercise_id))
         if students:
             results = list(filter(lambda r: r['participation']['student']['login'] in students, results))
         return results
@@ -91,11 +97,6 @@ class ArtemisAPI:
     def get_participation(self, participation_id):
         # type: (int) -> Dict
         return self.__get('/participations/%d' % participation_id)
-
-    @staticmethod
-    def get_participation_id(participation):
-        # type: (Dict) -> int
-        return participation['id'] if 'id' in participation else None
 
     def post_new_result(self, participation_id, score, text, feedbacks):
         # type: (int, int, str, List[Dict[str, str, bool]]) -> None

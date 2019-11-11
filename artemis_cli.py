@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 # pip install pyyaml argparse requests unicodecsv
+from collections import OrderedDict
+
 import yaml
 import os
 import sys
 import re
 import subprocess
 import unicodecsv as csv
+import json
 
 from functools import partial
 from xml.etree import ElementTree
@@ -34,24 +37,31 @@ def generate_gradebook(gradebook_dir, students):
     if os.path.exists(filename):
         print('Warning: gradebook already existed, delete the gradebook and run '
               'the repos command again if you want to generate a new gradebook.')
-
-    gradebook = {'assignment': args.assignment, 'assessments': list(map(lambda s: {
-        'name': s,
-        'score': 100,
-        'text': '',
-        'positive': [
-            ['', '']
-        ],
-        'negative': [
+    else:
+        assessments = ["""
+        {
+          name: %s,
+          score: 100,
+          text: '',
+          negative: [
             ['', ''],
             ['', '']
-        ]
-    }, students))}
+          ],
+          positive: [
+            ['', '']
+          ]
+        },""" % s for s in students]
 
-    with open(filename, 'w') as file:
-        yaml.dump(gradebook, file, encoding='utf-8')
+        gradebook = """{
+    assignment: %s,
+    assessments: [%s
+    ]
+}""" % (args.assignment, ''.join(assessments))
 
-    print('Successfully created %s' % filename)
+        with open(filename, 'w') as file:
+            file.write(gradebook)
+
+        print('Successfully created %s' % filename)
 
 
 def command_repos():
@@ -184,7 +194,7 @@ def command_results():
 
     results = api.get_results(api.get_exercise_id(args.exercise), args.students)
 
-    with open('results.csv', 'w') as csv_file:
+    with open('results.csv', 'w', encoding='utf-8') as csv_file:
         fields = ['name', 'login', 'type', 'score', 'result', 'feedbacks', 'assessor_name', 'assessor_login', 'repo']
         writer = csv.DictWriter(csv_file, fieldnames=fields, encoding='utf-8')
         writer.writeheader()
