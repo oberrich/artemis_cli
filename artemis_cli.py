@@ -122,7 +122,7 @@ def command_repos():
                 print('failed! `git clone` returned %d.' % status)
                 continue
 
-        if not any(student in s for s in ['exercise', 'solution', 'tests']) and deadline is not None:
+        if not any(student in s for s in special_repos) and deadline is not None:
             _, rev = run_git(['rev-list', '-1', '--before="%s"' % deadline, 'master'], cwd=repo_dir)
             run_git(['checkout', '`%s`' % rev], cwd=repo_dir)
 
@@ -131,16 +131,22 @@ def command_repos():
         num_succeeded += 1
         print('ok!')
 
-        # add student id to projectDescription/name in .project file to allow repo batch import into Eclipse
-        # tests is a Maven Project (no .project file), solution already has 'Solution' attached to name
-        if student not in ['tests', 'solution']:
-            project_file_dir = os.path.abspath(os.path.join(repo_dir, '.project'))
-            if os.path.exists(project_file_dir):
-                et = ElementTree.parse(project_file_dir)
-                et.getroot().find('name').text += ' ' + student
-                et.write(project_file_dir)
+        if general['fix_eclipse_import']:
+            dot_project_path = os.path.abspath(os.path.join(repo_dir, '.project'))
+
+            if os.path.exists(dot_project_path):
+                # parse .project file and find projectDescription/name
+                et = ElementTree.parse(dot_project_path)
+                name_node = et.getroot().find('name')
+
+                # and if not already done
+                if not name_node.text.lower().endswith(student):
+                    # append student name to it
+                    name_node.text += ' ' + student
+                    # and write back to .project file
+                    et.write(dot_project_path)
             else:
-                print('No .project file for %s found. Double-check the repository' % repo_dir)
+                pass # fail silently, project may not be a Java project
 
     num_repos = num_students + len(special_repos)
     print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
@@ -222,10 +228,8 @@ def command_grade(results=None):
 
 
 def main():
-    global parser, args, api, bitbucket, course_name, course_id
-
+    global args, general, api, bitbucket, course_name, course_id
     # disable stdout if --quiet
-
     # parse arguments
     parser = ArgParser()
     args = parser.parse_args()
@@ -235,6 +239,7 @@ def main():
         cfg = yaml.safe_load(config_file)
 
     # alias commonly used config fields
+    general = cfg['general']
     artemis = cfg['artemis']
     bitbucket = cfg['bitbucket']['base_url']
     course_name = artemis['course']['name']
