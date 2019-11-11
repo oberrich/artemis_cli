@@ -75,14 +75,16 @@ def command_repos():
     if not os.path.exists(course_dir):
         os.mkdir(course_dir)
     elif not os.path.isdir(course_dir):
-        print('Failed to create %s/ folder, because a non-directory file with the same name already exists.' % course_dir)
+        print('Failed to create %s/ folder, because a non-directory file with the same name already exists.'
+              % course_dir)
         sys.exit(1)
 
     assignment_dir = os.path.join(course_dir, assignment)
     if not os.path.exists(assignment_dir):
         os.mkdir(assignment_dir)
     elif not os.path.isdir(assignment_dir):
-        print('Failed to create %s/ folder, because a non-directory file with the same name already exists.' % assignment_dir)
+        print('Failed to create %s/ folder, because a non-directory file with the same name already exists.'
+              % assignment_dir)
         sys.exit(1)
 
     for student in special_repos + args.students:
@@ -148,10 +150,11 @@ def command_repos():
                     # and write back to .project file
                     et.write(dot_project_path)
             else:
-                pass # fail silently, project may not be a Java project
+                pass  # fail silently, project may not be a Java project
 
     num_repos = num_students + len(special_repos)
-    print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.' % (num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
+    print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.'
+          % (num_succeeded, num_repos, num_succeeded / float(num_repos) * 100.))
 
     if num_students > 2:
         generate_gradebook(assignment_dir, args.students)
@@ -163,7 +166,7 @@ def command_grades():
 
     for assessment in args.gradebook['assessments']:
         try:
-            args.students[0] = assessment['name'] # hacky
+            args.students[0] = assessment['name']  # hacky
             args.score = assessment['score']
             args.text = assessment['text']
             args.positive = list(filter(lambda f: f[0], assessment['positive']))
@@ -190,7 +193,8 @@ def command_results():
         for result in results:
             is_build_result = 'assessor' not in result
 
-            feedbacks = api.get_result_details(result['id']) if ('hasFeedback' in result and result['hasFeedback']) else []
+            feedbacks = api.get_result_details(result['id']) \
+                if ('hasFeedback' in result and result['hasFeedback']) else []
             feedbacks = list(map(
                 lambda f: {
                     'text': f['text'],
@@ -201,7 +205,7 @@ def command_results():
             ))
 
             if is_build_result:
-                feedbacks = list(filter(lambda f: f['positive'] == False, feedbacks))
+                feedbacks = list(filter(lambda f: f['positive'] is False, feedbacks))
 
             participation = result['participation']
             student = participation['student']
