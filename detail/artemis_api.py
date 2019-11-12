@@ -105,13 +105,9 @@ class ArtemisAPI:
     def post_new_result(self, exercise_id, result, score, text, feedbacks):
         # type: (int, Dict, int, str, List[Dict[str, str, bool]]) -> None
         is_build_result = 'assessmentType' not in result or result['assessmentType'] == 'AUTOMATIC'
-        # TODO dont get participation from participation route, instead build it from /courses/ and /exercises/ routes
-        #      to closer mimic artemis's use of the api
+        # Maybe dont get participation from participation route, instead build it from /courses/ and /exercises/ routes
+        # to closer mimic artemis's use of the api
         participation = self.get_participation(result['participation']['id'])
-        result['assessor'] = self.__get('/account')
         body = ManualResultBody(is_build_result, result, score, text, feedbacks, participation)
-        #if is_build_result:
-         #   self.__post('/manual-results', body)
-        #else:
         self.__put('/manual-results', body)
 

@@ -194,11 +194,15 @@ def command_repos():
                     test_dir = os.path.join(*([repo_dir, 'test'] + package_name.split('.')))
                     test_api_dir = os.path.join(*([repo_dir, 'test'] + test_api_package.split('.')))
 
+                    has_test_api = os.path.exists(test_api_dir)
+
                     copytree(test_dir, new_test_dir, ignore=ignore_patterns('testutils'))
-                    copytree(test_api_dir, os.path.join(new_test_dir, 'testapi'))
+                    if has_test_api:
+                        copytree(test_api_dir, os.path.join(new_test_dir, 'testapi'))
 
                     find_and_replace(new_test_dir, package_name, package_name + '.tutortest', '*.java')
-                    find_and_replace(new_test_dir, test_api_package, package_name + '.tutortest.testapi', '*.java')
+                    if has_test_api:
+                        find_and_replace(new_test_dir, test_api_package, package_name + '.tutortest.testapi', '*.java')
 
                     find_and_replace(new_test_dir,
                                      'package %s.tutortest;' % package_name,

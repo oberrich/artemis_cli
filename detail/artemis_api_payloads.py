@@ -18,8 +18,10 @@ class ManualResultBody(Serializable):
     def __init__(self, is_build_result, result, score, text, feedbacks, participation):
         # type: (bool, Dict, int, str, List[Dict[str,str,bool]], Dict) -> None
         if not is_build_result:
+            # just all fields of original result in case we missed something
             [setattr(self, k, v) for k, v in result.items()]
             self.id = result['id']
+        self.rated = True
         self.assessmentType = "MANUAL"
         self.buildArtifact = False
         self.score = score
