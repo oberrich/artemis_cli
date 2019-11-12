@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 # pip install pyyaml argparse requests unicodecsv
+import fnmatch
 from collections import OrderedDict
+from distutils.dir_util import copy_tree
 
 import yaml
 import os
@@ -11,6 +13,7 @@ import subprocess
 import csv
 import json
 
+from shutil import copytree, ignore_patterns
 from functools import partial
 from xml.etree import ElementTree
 
@@ -29,6 +32,18 @@ def run_git(params, cwd=None):
         print('  ' + out)
 
     return p.returncode, out
+
+
+# https://stackoverflow.com/a/6257321
+def find_and_replace(directory, find, replace, file_pattern):
+    for path, dirs, files in os.walk(os.path.abspath(directory)):
+        for filename in fnmatch.filter(files, file_pattern):
+            filepath = os.path.join(path, filename)
+            with open(filepath) as f:
+                s = f.read()
+            s = s.replace(find, replace)
+            with open(filepath, "w") as f:
+                f.write(s)
 
 
 def generate_gradebook(gradebook_dir, students):
@@ -78,7 +93,7 @@ def command_repos():
     print('Fetching %s-%s@{%s} for %d student%s.\n' % (course_name, assignment, str(deadline),
                                                        num_students, '' if num_students == 1 else 's'))
 
-    special_repos = ['exercise', 'solution', 'tests']
+    special_repos = ['tests', 'exercise', 'solution']
 
     course_dir = os.path.join(script_dir, course_name)
     if not os.path.exists(course_dir):
@@ -95,6 +110,8 @@ def command_repos():
         print('Failed to create %s/ folder, because a non-directory file with the same name already exists.'
               % assignment_dir)
         sys.exit(1)
+
+    package_name = None
 
     for student in special_repos + args.students:
         sys.stdout.write('Fetching assigment for %s... ' % student)
@@ -145,21 +162,56 @@ def command_repos():
         print('ok!')
 
         if general['fix_eclipse_import']:
-            dot_project_path = os.path.abspath(os.path.join(repo_dir, '.project'))
+            dot_project_path = os.path.join(repo_dir, '.project')
 
             if os.path.exists(dot_project_path):
                 # parse .project file and find projectDescription/name
-                et = ElementTree.parse(dot_project_path)
-                name_node = et.getroot().find('name')
-
+                dot_project = ElementTree.parse(dot_project_path)
+                name = dot_project.getroot().find('name')
+                project_name = '%s%s' % (assignment, student)
                 # and if not already done
-                if not name_node.text.lower().endswith(student):
+                if name is not None and not name.text == project_name:
                     # append student name to it
-                    name_node.text += ' ' + student
+                    name.text = project_name
                     # and write back to .project file
-                    et.write(dot_project_path)
+                    dot_project.write(dot_project_path)
             else:
                 pass  # fail silently, project may not be a Java project
+
+        if general['link_tests'] and course_name == 'pgdp1920':
+            if student == 'tests':
+                pom_xml_path = os.path.join(repo_dir, 'pom.xml')
+                if os.path.exists(pom_xml_path):
+                    pom_xml = ElementTree.parse(pom_xml_path)
+                    group_id = pom_xml.getroot().find('{http://maven.apache.org/POM/4.0.0}groupId')
+                    if group_id is not None:
+                        package_name = group_id.text
+
+                new_test_dir = os.path.join(assignment_dir, 'tutortest')
+                if not os.path.exists(new_test_dir):
+                    test_api_package = 'tum.pgdp.testapi'
+
+                    test_dir = os.path.join(*([repo_dir, 'test'] + package_name.split('.')))
+                    test_api_dir = os.path.join(*([repo_dir, 'test'] + test_api_package.split('.')))
+
+                    has_test_api = os.path.exists(test_api_dir)
+
+                    copytree(test_dir, new_test_dir, ignore=ignore_patterns('testutils'))
+                    if has_test_api:
+                        copytree(test_api_dir, os.path.join(new_test_dir, 'testapi'))
+
+                    find_and_replace(new_test_dir, package_name, package_name + '.tutortest', '*.java')
+                    if has_test_api:
+                        find_and_replace(new_test_dir, test_api_package, package_name + '.tutortest.testapi', '*.java')
+
+                    find_and_replace(new_test_dir,
+                                     'package %s.tutortest;' % package_name,
+                                     'package %s.tutortest;\nimport %s.*;' % (package_name, package_name),
+                                     '*.java')
+                pass
+            elif package_name is not None:
+                copytree(os.path.join(assignment_dir, 'tutortest'),
+                         os.path.join(*([repo_dir, 'src'] + package_name.split('.') + ['tutortest'])))
 
     num_repos = num_students + len(special_repos)
     print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.'
@@ -192,15 +244,18 @@ def command_grades():
 def command_results():
     print('Fetching results for all students, this may take a few seconds...')
 
-    results = api.get_results(api.get_exercise_id(args.exercise), args.students)
+    results = api.get_results(api.get_exercise_id(args.exercise), args.students, with_assessors=True)
 
     with open('results.csv', 'w', newline='') as csv_file:
-        fields = ['name', 'login', 'type', 'score', 'result', 'feedbacks', 'assessor_name', 'assessor_login', 'repo']
+        fields = ['name', 'login', 'type', 'score', 'result', 'feedbacks', 'assessor_name', 'assessor_login',
+                  'repo']
         writer = csv.DictWriter(csv_file, fieldnames=fields)
         writer.writeheader()
 
+        num_exported = 0
+
         for result in results:
-            is_build_result = 'assessor' not in result
+            is_build_result = 'assessmentType' not in result or result['assessmentType'] == 'AUTOMATIC'
 
             feedbacks = api.get_result_details(result['id']) \
                 if ('hasFeedback' in result and result['hasFeedback']) else []
@@ -219,8 +274,14 @@ def command_results():
             participation = result['participation']
             student = participation['student']
 
-            assessor_name = 'Bamboo' if is_build_result else result['assessor']['name']
-            assessor_login = '' if is_build_result else result['assessor']['login']
+            assessor_name = ''
+            assessor_login = ''
+
+            if is_build_result:
+                assessor_name = 'Bamboo'
+            elif 'assessor' in result:
+                assessor_name = result['assessor']['name']
+                assessor_login = result['assessor']['login']
 
             writer.writerow({
                 'name': student['name'],
@@ -234,11 +295,14 @@ def command_results():
                 'repo': participation['repositoryUrl']
             })
 
-    print('Done, exported all results to result.csv')
+            num_exported += 1
+
+    print('Done, exported %d results to result.csv' % num_exported)
 
 
 def command_grade(results=None):
-    results = results[:]
+    if results is not None:
+        results = results[:]
     is_internal_use = results is not None
 
     # TODO change so we can reuse it for submitting all student's scores
@@ -273,10 +337,10 @@ def command_grade(results=None):
 
     student_result = [r for r in results if r['participation']['student']['login'] == args.students[0]]
     if not student_result:
-        raise RuntimeError('No previous result for any of the students')
+        raise RuntimeError('No previous result for student')
 
     print('Submitting feedback for student ' + args.students[0])
-    api.post_new_result(student_result[0], args.score, args.text, feedbacks)
+    api.post_new_result(args.exercise, student_result[0], args.score, args.text, feedbacks)
 
     if not is_internal_use:
         print('Done!')
@@ -323,34 +387,23 @@ def main():
         args.assignment = args.gradebook['assignment']
         args.students = list(map(lambda s: s['name'], args.gradebook['assessments']))
 
-    # verify course name against patterns
-    if course_name == 'pgdp1920':
-        regex = '^w[0-9][0-9]%s[hp][0-9][0-9]%s$'
-
-        if not re.match(regex % ('?', '?'), args.assignment):
-            raise RuntimeError('Assignment name doesn\'t match the shortName convention of PGdP course')
-
-        if not re.match(regex % ('', ''), args.assignment):
-            print('Warning: Usually shortNames for exercises follow the convention "w01h01",'
-                  ' you can find the correct shortName on ArTEMiS if pulling the repos fails')
-
     # get exercise data from artemis, raise if it doesn't exist
     args.exercise = api.get_exercise(args.assignment)
     if args.exercise is None:
-        raise RuntimeError('Exercise does not exist, you can find the correct shortName on ArTEMiS')
+        print('Exercise does not exist, you can find the correct shortName on ArTEMiS')
+        sys.exit(1)
 
     # normalize student names
     if hasattr(args, 'student'):
         args.students = [args.student]
 
     if args.command != 'results' or hasattr(args, 'students'):
-        # by removing whitespaces, commas and duplicates
-        args.students = list(set(filter(lambda s: s, [s.replace(' ', '').replace(',', '') for s in args.students])))
-        args.students.sort()
-
+        # split students by comma, strip white spaces, remove empty students and duplicates then sort list of students
+        args.students = sorted(list(set([s.strip() for ss in args.students for s in ss.split(',') if s])))
         # raise if no well-formed students have been passed to args
         if not args.students:
-            raise RuntimeError('No valid student name in args.students')
+            print('No valid student name in args.students')
+            exit(1)
     else:
         args.students = None
 

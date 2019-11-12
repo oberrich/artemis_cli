@@ -86,10 +86,10 @@ class ArtemisAPI:
         # type: (Dict) -> int
         return participation['id'] if 'id' in participation else None
 
-    def get_results(self, exercise_id, students=None):
-        # type: (id, List[str]) -> List[Dict]
-        results = self.__get('/courses/%d/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=false'
-                             % (self._course['id'], exercise_id))
+    def get_results(self, exercise_id, students=None, with_assessors=False):
+        # type: (id, List[str], bool) -> List[Dict]
+        results = self.__get('/courses/%d/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=%s'
+                             % (self._course['id'], exercise_id, str(with_assessors)))
         if students:
             results = list(filter(lambda r: r['participation']['student']['login'] in students, results))
         return results
@@ -102,9 +102,12 @@ class ArtemisAPI:
         # type: (int) -> Dict
         return self.__get('/participations/%d' % participation_id)
 
-    def post_new_result(self, result, score, text, feedbacks):
-        # type: (Dict, int, str, List[Dict[str, str, bool]]) -> None
+    def post_new_result(self, exercise_id, result, score, text, feedbacks):
+        # type: (int, Dict, int, str, List[Dict[str, str, bool]]) -> None
+        is_build_result = 'assessmentType' not in result or result['assessmentType'] == 'AUTOMATIC'
+        # Maybe dont get participation from participation route, instead build it from /courses/ and /exercises/ routes
+        # to closer mimic artemis's use of the api
         participation = self.get_participation(result['participation']['id'])
-        body = ManualResultBody(result, score, text, feedbacks, participation)
-        print(json.dumps(self.__put('/manual-results', body), indent=4))
+        body = ManualResultBody(is_build_result, result, score, text, feedbacks, participation)
+        self.__put('/manual-results', body)
 
