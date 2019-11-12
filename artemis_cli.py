@@ -336,7 +336,7 @@ def command_grade(results=None):
         raise RuntimeError('No previous result for student')
 
     print('Submitting feedback for student ' + args.students[0])
-    api.post_new_result(student_result[0], args.score, args.text, feedbacks)
+    api.post_new_result(args.exercise, student_result[0], args.score, args.text, feedbacks)
 
     if not is_internal_use:
         print('Done!')
