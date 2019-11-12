@@ -54,24 +54,24 @@ def generate_gradebook(gradebook_dir, students):
               'the repos command again if you want to generate a new gradebook.')
     else:
         assessments = ["""
-      {
-        name: %s,
-        score: 100,
-        text: '',
-        negative: [
-          ['', ''],
-          ['', '']
-        ],
-        positive: [
-          ['', '']
-        ]
-      },""" % s for s in students]
+  {
+    name: %s,
+    score: 100,
+    text: '',
+    negative: [
+      ['', ''],
+      ['', '']
+    ],
+    positive: [
+      ['', '']
+    ]
+  },""" % s for s in students]
 
         gradebook = """{
-      assignment: %s,
-      assessments: [%s
-      ]
-    }""" % (args.assignment, ''.join(assessments))
+  assignment: %s,
+  assessments: [%s
+  ]
+}""" % (args.assignment, ''.join(assessments))
 
         with open(filename, 'w') as file:
             file.write(gradebook)
