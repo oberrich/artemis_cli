@@ -18,7 +18,7 @@ class ArtemisAPI:
         s = requests.Session()
 
         s.headers.update({
-            'User-Agent': "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0",
+            'User-Agent': "github.com/oberrich/artemis_cli",
             'X-XSRF-TOKEN': "2d141b5-9e1c-4390-ae06-5143753b4459",
             'Content-Type': "application/json;charset=UTF-8",
             'Accept': "application/json, text/plain, */*",
