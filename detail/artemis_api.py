@@ -110,4 +110,3 @@ class ArtemisAPI:
         participation = self.get_participation(result['participation']['id'])
         body = ManualResultBody(is_build_result, result, score, text, feedbacks, participation)
         self.__put('/manual-results', body)
-
