@@ -107,6 +107,7 @@ class ArtemisAPI:
         is_build_result = 'assessmentType' not in result or result['assessmentType'] == 'AUTOMATIC'
         # Maybe dont get participation from participation route, instead build it from /courses/ and /exercises/ routes
         # to closer mimic artemis's use of the api
-        participation = self.get_participation(result['participation']['id'])
+        participation_id = result['participation']['id']
+        participation = self.get_participation(participation_id)
         body = ManualResultBody(is_build_result, result, score, text, feedbacks, participation)
-        self.__put('/manual-results', body)
+        self.__put('/participations/%d/manual-results' % participation_id, body)
