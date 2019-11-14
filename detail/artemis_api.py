@@ -108,6 +108,5 @@ class ArtemisAPI:
         # Maybe dont get participation from participation route, instead build it from /courses/ and /exercises/ routes
         # to closer mimic artemis's use of the api
         participation_id = result['participation']['id']
-        participation = self.get_participation(participation_id)
-        body = ManualResultBody(is_build_result, result, score, text, feedbacks, participation)
+        body = ManualResultBody(is_build_result, result, score, text, feedbacks)
         self.__put('/participations/%d/manual-results' % participation_id, body)
