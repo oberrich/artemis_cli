@@ -18,7 +18,7 @@ class ArtemisAPI:
         s = requests.Session()
 
         s.headers.update({
-            'User-Agent': "github.com/oberrich/artemis_cli",
+            'User-Agent': "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0",
             'X-XSRF-TOKEN': "2d141b5-9e1c-4390-ae06-5143753b4459",
             'Content-Type': "application/json;charset=UTF-8",
             'Accept': "application/json, text/plain, */*",
@@ -107,6 +107,7 @@ class ArtemisAPI:
         is_build_result = 'assessmentType' not in result or result['assessmentType'] == 'AUTOMATIC'
         # Maybe dont get participation from participation route, instead build it from /courses/ and /exercises/ routes
         # to closer mimic artemis's use of the api
-        participation_id = result['participation']['id']
-        body = ManualResultBody(is_build_result, result, score, text, feedbacks)
-        self.__put('/participations/%d/manual-results' % participation_id, body)
+        participation = self.get_participation(result['participation']['id'])
+        body = ManualResultBody(is_build_result, result, score, text, feedbacks, participation)
+        self.__put('/manual-results', body)
+

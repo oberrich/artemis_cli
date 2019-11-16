@@ -1,22 +1,21 @@
 #!/usr/bin/env python
-# coding: utf-8
 
 # pip install pyyaml argparse requests unicodecsv
 import fnmatch
+from collections import OrderedDict
+from distutils.dir_util import copy_tree
+
 import yaml
 import os
 import sys
-import random
 import re
 import subprocess
+import csv
 import json
-import datetime
-import unicodecsv as csv
 
 from shutil import copytree, ignore_patterns
 from functools import partial
 from xml.etree import ElementTree
-from codecs import open
 
 from detail.artemis_api import ArtemisAPI
 from detail.arg_parser import ArgParser
@@ -40,60 +39,41 @@ def find_and_replace(directory, find, replace, file_pattern):
     for path, dirs, files in os.walk(os.path.abspath(directory)):
         for filename in fnmatch.filter(files, file_pattern):
             filepath = os.path.join(path, filename)
-            with open(filepath, encoding='utf-8') as f:
+            with open(filepath) as f:
                 s = f.read()
             s = s.replace(find, replace)
-            with open(filepath, "w", encoding='utf-8') as f:
+            with open(filepath, "w") as f:
                 f.write(s)
 
 
 def generate_gradebook(gradebook_dir, students):
     filename = os.path.join(gradebook_dir, 'gradebook.yml')
 
-
-    penguin_species = [
-        'Adéliepinguin',
-        'Brillenpinguin',
-        'Dickschnabelpinguin',
-        'Eselspinguin',
-        'Galápagospinguin',
-        'Gelbaugenpinguin',
-        'Goldschopfpinguin',
-        'Haubenpinguin',
-        'Humboldtpinguin',
-        'Kaiserpinguin',
-        'Kronenpinguin',
-        'Königspinguin',
-        'Magellanpinguin',
-        'Snaresinselpinguin',
-        'Südlicher Felsenpinguin',
-        'Zwergpinguin',
-        'Zügelpinguin'
-    ]
-
     if os.path.exists(filename):
         print('Warning: gradebook already existed, delete the gradebook and run '
               'the repos command again if you want to generate a new gradebook.')
     else:
         assessments = ["""
-  - name: %s
-    score: 100
-    text: ''
-    negative:
-      - text: '' 
-        detail: ''
-      - text: ''
-        detail: ''
-    positive:
-      - text: ''
-        detail: ''
-  # %s""" % (s, random.choice(penguin_species)) for s in students]
+  {
+    name: %s,
+    score: 100,
+    text: '',
+    negative: [
+      ['', ''],
+      ['', '']
+    ],
+    positive: [
+      ['', '']
+    ]
+  },""" % s for s in students]
 
-        gradebook = """generated_at: %s
-assignment: %s
-assessments:%s""" % (datetime.datetime.utcnow().isoformat(), args.assignment, ''.join(assessments))
+        gradebook = """{
+  assignment: %s,
+  assessments: [%s
+  ]
+}""" % (args.assignment, ''.join(assessments))
 
-        with open(filename, 'w', encoding='utf-8') as file:
+        with open(filename, 'w') as file:
             file.write(gradebook)
 
         print('Successfully created %s' % filename)
@@ -235,10 +215,8 @@ def command_repos():
                                      '*.java')
                 pass
             elif package_name is not None:
-                student_test_path = os.path.join(*([repo_dir, 'src'] + package_name.split('.') + ['tutortest']))
-
-                if not os.path.exists(student_test_path):
-                    copytree(os.path.join(assignment_dir, 'tutortest'), student_test_path)
+                copytree(os.path.join(assignment_dir, 'tutortest'),
+                         os.path.join(*([repo_dir, 'src'] + package_name.split('.') + ['tutortest'])))
 
                 if pom_xml_tpl:
                     with open(os.path.join(repo_dir, 'pom.xml'), 'w') as pom_file:
@@ -254,45 +232,34 @@ def command_repos():
 
 
 def command_grades():
-    print('Fetching results for all students, this may take a few seconds...\n')
+    print('Fetching results for all students, this may take a few seconds...')
     results = api.get_results(api.get_exercise_id(args.exercise), args.students)
-
-    num_submitted = 0
 
     for assessment in args.gradebook['assessments']:
         try:
             args.students[0] = assessment['name']  # hacky
             args.score = assessment['score']
             args.text = assessment['text']
-
-            # make sure changes don't break old gradebook formats
-            # TODO remove else-block in a few weeks from now (11/13/2019)
-            if 'generated_at' in args.gradebook:
-                args.positive = [[f['text'], f['detail']] for f in assessment['positive'] if f['text']]
-                args.negative = [[f['text'], f['detail']] for f in assessment['negative'] if f['text']]
-            else:
-                args.positive = list(filter(lambda f: f[0], assessment['positive']))
-                args.negative = list(filter(lambda f: f[0], assessment['negative']))
+            args.positive = list(filter(lambda f: f[0], assessment['positive']))
+            args.negative = list(filter(lambda f: f[0], assessment['negative']))
 
             command_grade(results=results)
-            num_submitted += 1
         except RuntimeError as err:
-            print('Failed to submit student %s because %s' % (args.students[0], str(err)))
+            print('  Failed with error: ' + str(err))
+            print('  Continuing with next student')
 
-    print('Done, submitted results for %d students!' % num_submitted)
+    print('Done!')
 
 
 def command_results():
-    print('Fetching results for all students, this may take a few seconds...\n')
+    print('Fetching results for all students, this may take a few seconds...')
 
     results = api.get_results(api.get_exercise_id(args.exercise), args.students, with_assessors=True)
 
-    with open('results.csv', 'wb') as csv_file:
-        csv_file.write(u'\ufeff'.encode('utf8'))
-
+    with open('results.csv', 'w', newline='') as csv_file:
         fields = ['name', 'login', 'type', 'score', 'result', 'feedbacks', 'assessor_name', 'assessor_login',
                   'repo']
-        writer = csv.DictWriter(csv_file, fieldnames=fields, encoding='utf-8')
+        writer = csv.DictWriter(csv_file, fieldnames=fields)
         writer.writeheader()
 
         num_exported = 0
@@ -382,8 +349,7 @@ def command_grade(results=None):
     if not student_result:
         raise RuntimeError('No previous result for student')
 
-    if not is_internal_use:
-        print('Submitting feedback for student ' + args.students[0])
+    print('Submitting feedback for student ' + args.students[0])
     api.post_new_result(args.exercise, student_result[0], args.score, args.text, feedbacks)
 
     if not is_internal_use:
@@ -398,7 +364,7 @@ def main():
     args = parser.parse_args()
 
     # load config
-    with open('config.yml', 'r', encoding='utf-8') as config_file:
+    with open('config.yml', 'r') as config_file:
         cfg = yaml.safe_load(config_file)
 
     # alias commonly used config fields
@@ -421,7 +387,7 @@ def main():
             FileNotFoundError = IOError
 
         try:
-            with open(args.file, 'r', encoding='utf-8') as file:
+            with open(args.file, 'r') as file:
                 args.gradebook = yaml.load(file, Loader=yaml.SafeLoader)
         except FileNotFoundError as err:
             print(err)
