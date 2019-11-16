@@ -1,5 +1,6 @@
 general:
   fix_eclipse_import: True
+  link_tests: True
   root_dir: '/not/implemented/yet'
 
 bitbucket:
