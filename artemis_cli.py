@@ -134,7 +134,7 @@ def command_repos():
     package_name = None
     pom_xml_tpl = None
 
-    if general['link_tests'] and course_name == 'pgdp1920':
+    if False and general['link_tests'] and course_name == 'pgdp1920':
         with open(os.path.join(script_dir, 'detail', 'pom.xml.tpl'), 'r') as tpl_file:
             pom_xml_tpl = tpl_file.read()
 
@@ -240,7 +240,7 @@ def command_repos():
                 if not os.path.exists(student_test_path):
                     copytree(os.path.join(assignment_dir, 'tutortest'), student_test_path)
 
-                if pom_xml_tpl:
+                if False and pom_xml_tpl:
                     with open(os.path.join(repo_dir, 'pom.xml'), 'w') as pom_file:
                         fs_name = package_name.replace('.', '-') + '-tests'
                         pom_file.write(pom_xml_tpl % (package_name, fs_name, fs_name))
