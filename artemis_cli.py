@@ -133,6 +133,7 @@ def command_repos():
 
     package_name = None
     pom_xml_tpl = None
+    sandbox_ver = "0.1.3"
 
     if general['link_tests'] and course_name == 'pgdp1920':
         with open(os.path.join(script_dir, 'detail', 'pom.xml.tpl'), 'r') as tpl_file:
@@ -207,10 +208,19 @@ def command_repos():
             if student == 'tests':
                 pom_xml_path = os.path.join(repo_dir, 'pom.xml')
                 if os.path.exists(pom_xml_path):
+                    schema = '{http://maven.apache.org/POM/4.0.0}'
                     pom_xml = ElementTree.parse(pom_xml_path)
-                    group_id = pom_xml.getroot().find('{http://maven.apache.org/POM/4.0.0}groupId')
+                    group_id = pom_xml.getroot().find('%sgroupId' % schema)
                     if group_id is not None:
                         package_name = group_id.text
+                    # extract sandbox version
+                    depends = pom_xml.getroot().find('%sdependencies' % schema)
+                    depends = depends.findall('%sdependency' % schema)
+
+                    for depend in depends:
+                        artifact_id = depend.find('%sartifactId' % schema)
+                        if artifact_id.text == 'artemis-java-test-sandbox':
+                            sandbox_ver = depend.find('%sversion' % schema).text
 
                 new_test_dir = os.path.join(assignment_dir, 'tutortest')
                 if not os.path.exists(new_test_dir):
@@ -243,7 +253,7 @@ def command_repos():
                 if pom_xml_tpl:
                     with open(os.path.join(repo_dir, 'pom.xml'), 'w') as pom_file:
                         fs_name = package_name.replace('.', '-') + '-' + student
-                        pom_file.write(pom_xml_tpl % (package_name, fs_name, fs_name))
+                        pom_file.write(pom_xml_tpl % (package_name, fs_name, fs_name, sandbox_ver))
 
     num_repos = num_students + len(special_repos)
     print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.'

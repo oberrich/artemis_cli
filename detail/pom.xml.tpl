@@ -44,7 +44,7 @@
         <dependency>
             <groupId>de.tum.in</groupId>
             <artifactId>artemis-java-test-sandbox</artifactId>
-            <version>0.1.3</version>
+            <version>%s</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
