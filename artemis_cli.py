@@ -112,6 +112,11 @@ def command_repos():
         sys.exit(1)
 
     package_name = None
+    pom_xml_tpl = None
+
+    if general['link_tests'] and course_name == 'pgdp1920':
+        with open(os.path.join(script_dir, 'detail', 'pom.xml.tpl'), 'r') as tpl_file:
+            pom_xml_tpl = tpl_file.read()
 
     for student in special_repos + args.students:
         sys.stdout.write('Fetching assigment for %s... ' % student)
@@ -212,6 +217,11 @@ def command_repos():
             elif package_name is not None:
                 copytree(os.path.join(assignment_dir, 'tutortest'),
                          os.path.join(*([repo_dir, 'src'] + package_name.split('.') + ['tutortest'])))
+
+                if pom_xml_tpl:
+                    with open(os.path.join(repo_dir, 'pom.xml'), 'w') as pom_file:
+                        fs_name = package_name.replace('.', '-') + '-tests'
+                        pom_file.write(pom_xml_tpl % (package_name, fs_name, fs_name))
 
     num_repos = num_students + len(special_repos)
     print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.'
