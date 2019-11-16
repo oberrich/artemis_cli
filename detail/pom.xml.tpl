@@ -4,8 +4,18 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>%s</groupId>
     <artifactId>%s</artifactId>
+    <name>%s</name>
     <packaging>jar</packaging>
     <version>1.0</version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <repositories>
+        <repository>
+            <id>ajts</id>
+            <url>https://gitlab.com/ajts-mvn/repo/raw/master/</url>
+        </repository>
+    </repositories>
     <build>
         <sourceDirectory>${project.basedir}/src</sourceDirectory>
         <plugins>
@@ -30,11 +40,23 @@
         </plugin>
     </plugins>
     </build>
-    <name>%s</name>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
     <dependencies>
+        <dependency>
+            <groupId>de.tum.in</groupId>
+            <artifactId>artemis-java-test-sandbox</artifactId>
+            <version>0.1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20190722</version>
+        </dependency>
+        <dependency>
+            <groupId>me.xdrop</groupId>
+            <artifactId>fuzzywuzzy</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <!-- TODO remove these in week 5-6 -->
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
@@ -51,19 +73,10 @@
             <version>5.5.2</version>
         </dependency>
         <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20190722</version>
-        </dependency>
-        <dependency>
-            <groupId>me.xdrop</groupId>
-            <artifactId>fuzzywuzzy</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
         </dependency>
+        <!-- TODO remove these in week 5-6 -->
     </dependencies>
 </project>
