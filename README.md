@@ -1,13 +1,10 @@
 # artemis-cli
 A command-line application for tutors to more productively grade programming excises on ArTEMiS
 
-## Beta notice
-[![forthebadge](https://forthebadge.com/images/badges/fuck-it-ship-it.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/60-percent-of-the-time-works-every-time.svg)](https://forthebadge.com)
-
-This program is still in beta and hasn't been thoroughly tested yet, make sure your grades were actually submitted properly.
-
 ## Contribute
-If you want to contribute to this script, please create a Pull Request into `develop`
+If you want to contribute to this script, please create a Pull Request into `develop`.
+
+You can also contribute by creating an issue when you find bugs or have ideas on how to improve the life of tutors.
 
 ## Overview and purpose
 Used for the introductory course "Praktikum Grundlagen der Programmierung"
