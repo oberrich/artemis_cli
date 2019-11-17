@@ -27,6 +27,9 @@ exercises in order to grade them. **This script assists the relevant steps in th
 
 Run the script via `./artemis_cli <command>`
 
+## Importing assignments into Eclipse/IntelliJ
+- Eclipse: `File` -> `Import` -> `Maven` -> `Existing Maven Projects` -> `Root Directory`: `path/to/course/assignment`
+- IntelliJ: `Import Project` -> `path/to/course/assignment` -> `Import project from external model` -> `Maven` -> `Tick "Search for projects recursively"` -> `Next` ... `Finish`
 
 ## Supported commands (continuously updated)
 1. `repos`  Download all student repos
