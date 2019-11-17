@@ -27,8 +27,10 @@ exercises in order to grade them. **This script assists the relevant steps in th
 
 Run the script via `./artemis_cli <command>`
 
-## IDE supported grading/ Importing assignments into Eclipse/IntelliJ
-Commonly, the student-assignments have to be imported into the IDE of your choice. As the command `repos` adds the tests to the student-assignment, the projects (now) need to be imported as `Existing Maven Project`.
+## IDE supported grading
+Commonly, the student-assignments have to be imported into the IDE of your choice. As the command `repos` adds the tests
+ to the student-assignment, the projects (now) need to be **imported as Existing Maven Project**. See below on how to 
+ import assignments into Eclipse/IntelliJ:
 - Eclipse: `File` -> `Import` -> `Maven` -> `Existing Maven Projects` -> `Root Directory`: `path/to/course/assignment`
 - IntelliJ: `Import Project` -> `path/to/course/assignment` -> `Import project from external model` -> `Maven` -> `Tick "Search for projects recursively"` -> `Next` ... `Finish`
 
