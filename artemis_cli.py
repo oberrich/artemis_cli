@@ -3,6 +3,8 @@
 
 # pip install pyyaml argparse requests unicodecsv
 import fnmatch
+import shutil
+
 import yaml
 import os
 import sys
@@ -13,7 +15,7 @@ import json
 import datetime
 import unicodecsv as csv
 
-from shutil import copytree, ignore_patterns
+from shutil import copytree, copyfile, ignore_patterns
 from functools import partial
 from xml.etree import ElementTree
 from codecs import open
@@ -134,6 +136,7 @@ def command_repos():
     package_name = None
     pom_xml_tpl = None
     sandbox_ver = "0.1.3"
+    minijava_exists = False
 
     if general['link_tests'] and course_name == 'pgdp1920':
         with open(os.path.join(script_dir, 'detail', 'pom.xml.tpl'), 'r') as tpl_file:
@@ -243,12 +246,23 @@ def command_repos():
                                      'package %s.tutortest;' % package_name,
                                      'package %s.tutortest;\nimport %s.*;' % (package_name, package_name),
                                      '*.java')
+                    minijava_exists = os.path.exists(os.path.join(new_test_dir, 'MiniJava.java'))
+                    if minijava_exists:
+                        find_and_replace(new_test_dir, package_name + '.tutortest', package_name, 'MiniJava.java')
                 pass
             elif package_name is not None:
                 student_test_path = os.path.join(*([repo_dir, 'src'] + package_name.split('.') + ['tutortest']))
 
                 if not os.path.exists(student_test_path):
                     copytree(os.path.join(assignment_dir, 'tutortest'), student_test_path)
+
+                    minijava_path = os.path.join(os.path.join(student_test_path, 'MiniJava.java'))
+                    if minijava_exists:
+                        student_minijava_path = os.path.join(*([repo_dir, 'src'] + package_name.split('.') + ['MiniJava.java']))
+                        if os.path.exists(student_minijava_path):
+                            os.remove(student_minijava_path)
+                            copyfile(minijava_path, student_minijava_path)
+                            os.remove(minijava_path)
 
                 if pom_xml_tpl:
                     with open(os.path.join(repo_dir, 'pom.xml'), 'w') as pom_file:
