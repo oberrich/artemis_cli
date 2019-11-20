@@ -247,8 +247,6 @@ def command_repos():
                                      'package %s.tutortest;\nimport %s.*;' % (package_name, package_name),
                                      '*.java')
                     minijava_exists = os.path.exists(os.path.join(new_test_dir, 'MiniJava.java'))
-                    if minijava_exists:
-                        find_and_replace(new_test_dir, package_name + '.tutortest', package_name, 'MiniJava.java')
                 pass
             elif package_name is not None:
                 student_test_path = os.path.join(*([repo_dir, 'src'] + package_name.split('.') + ['tutortest']))
@@ -260,6 +258,7 @@ def command_repos():
                     if minijava_exists:
                         student_minijava_path = os.path.join(*([repo_dir, 'src'] + package_name.split('.') + ['MiniJava.java']))
                         if os.path.exists(student_minijava_path):
+                            find_and_replace(student_test_path, package_name + '.tutortest', package_name, 'MiniJava.java')
                             os.remove(student_minijava_path)
                             copyfile(minijava_path, student_minijava_path)
                             os.remove(minijava_path)
