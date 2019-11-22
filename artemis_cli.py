@@ -76,13 +76,14 @@ def generate_gradebook(gradebook_dir, students):
     if os.path.exists(filename):
         print('Warning: gradebook already existed, delete the gradebook and run '
               'the repos command again if you want to generate a new gradebook.')
+        return
     else:
         assessments = ["""
   - name: %s
     score: 100
     text: ''
     negative:
-      - text: '' 
+      - text: ''
         detail: ''
       - text: ''
         detail: ''
@@ -95,10 +96,14 @@ def generate_gradebook(gradebook_dir, students):
 assignment: %s
 assessments:%s""" % (datetime.datetime.utcnow().isoformat(), args.assignment, ''.join(assessments))
 
-        with open(filename, 'w', encoding='utf-8') as file:
-            file.write(gradebook)
-
-        print('Successfully created %s' % filename)
+        try:
+            with open(filename, 'w', encoding='utf-8') as file:
+                file.write(gradebook.decode('utf-8'))
+            print('Successfully created %s' % filename)
+        except:
+            print("Failed to create %s due to error:\n" % filename)
+            os.remove(filename)
+            raise
 
 
 def command_repos():
