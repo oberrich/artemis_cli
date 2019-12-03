@@ -98,7 +98,7 @@ assessments:%s""" % (datetime.datetime.utcnow().isoformat(), args.assignment, ''
 
         try:
             with open(filename, 'w', encoding='utf-8') as file:
-                file.write(gradebook.decode('utf-8'))
+                file.write(gradebook.encode('utf-8').decode('utf-8'))
             print('Successfully created %s' % filename)
         except:
             print("Failed to create %s due to error:\n" % filename)
