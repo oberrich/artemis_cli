@@ -304,7 +304,7 @@ def command_grades():
 
             command_grade(results=results)
             num_submitted += 1
-        except RuntimeError as err:
+        except Exception as err:
             print('Failed to submit student %s because %s' % (args.students[0], str(err)))
 
     print('Done, submitted results for %d students!' % num_submitted)
@@ -444,14 +444,9 @@ def main():
     if args.command == 'grades':
         args.gradebook = None
         try:
-            FileNotFoundError
-        except NameError:
-            FileNotFoundError = IOError
-
-        try:
             with open(args.file, 'r', encoding='utf-8') as file:
                 args.gradebook = yaml.load(file, Loader=yaml.SafeLoader)
-        except FileNotFoundError as err:
+        except Exception as err:
             print(err)
             print('Example for gradebook path pgdp1920/w01h01/gradebook.yml')
             sys.exit(1)
