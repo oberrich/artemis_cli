@@ -88,8 +88,8 @@ class ArtemisAPI:
 
     def get_results(self, exercise_id, students=None, with_assessors=False):
         # type: (id, List[str], bool) -> List[Dict]
-        results = self.__get('/courses/%d/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=%s'
-                             % (self._course['id'], exercise_id, str(with_assessors)))
+        results = self.__get('/exercises/%d/results?ratedOnly=true&withSubmissions=false&withAssessors=%s'
+                             % (exercise_id, str(with_assessors)))
         if students:
             results = list(filter(lambda r: r['participation']['student']['login'] in students, results))
         return results
