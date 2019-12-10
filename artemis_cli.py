@@ -94,7 +94,10 @@ def generate_gradebook(gradebook_dir, students):
 
         gradebook = """generated_at: %s
 assignment: %s
-assessments:%s""" % (datetime.datetime.utcnow().isoformat(), args.assignment, ''.join(assessments))
+# %s
+assessments:%s""" % (datetime.datetime.utcnow().isoformat(), args.assignment,
+                     ','.join([s for s in students]),
+                     ''.join(assessments))
 
         try:
             with open(filename, 'w', encoding='utf-8') as file:
