@@ -18,6 +18,16 @@
     </repositories>
     <build>
         <sourceDirectory>${project.basedir}/src</sourceDirectory>
+        <resources>
+            <resource>
+                <filtering>false</filtering>
+                <targetPath>${project.build.directory}/classes/%s/tutortest</targetPath>
+                <directory>${project.basedir}/src/%s/tutortest</directory>
+                <includes>
+                    <include>test.json</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -240,18 +240,32 @@ def command_repos():
                     test_dir = os.path.join(*([repo_dir, 'test'] + package_name.split('.')))
                     test_api_dir = os.path.join(*([repo_dir, 'test'] + test_api_package.split('.')))
 
+                    has_test_dir = os.path.exists(test_dir)
+                    is_artemist_test = not has_test_dir
+                    if is_artemist_test:
+                        test_dir = os.path.join(*([repo_dir, 'structural', 'test'] + package_name.split('.')))
+                        test_api_dir = os.path.join(*([repo_dir, 'behavior', 'test'] + package_name.split('.')))
+
+                        if not os.path.exists(test_dir) or not os.path.exists(test_api_dir):
+                            raise RuntimeError("Unknown Test API")
+
                     has_test_api = os.path.exists(test_api_dir)
 
-                    copytree(test_dir, new_test_dir, ignore=ignore_patterns('testutils'))
+                    copytree(test_dir, new_test_dir, ignore=ignore_patterns(
+                        'testutils' if not is_artemist_test else 'DUMMYFILTER', 'pom.xml'))
                     if has_test_api:
-                        copytree(test_api_dir, os.path.join(new_test_dir, 'testapi'))
+                        if not is_artemist_test:
+                            copytree(test_api_dir, os.path.join(new_test_dir, 'testapi'))
+                        else:
+                            copytree(test_api_dir, os.path.join(new_test_dir, 'behavior'), ignore=ignore_patterns(
+                                'pom.xml'))
 
-                    find_and_replace(new_test_dir, package_name, package_name + '.tutortest', '*.java')
-                    if has_test_api:
+                    # find_and_replace(new_test_dir, package_name, package_name + '.tutortest', '*.java')
+                    if has_test_api and not is_artemist_test:
                         find_and_replace(new_test_dir, test_api_package, package_name + '.tutortest.testapi', '*.java')
 
                     find_and_replace(new_test_dir,
-                                     'package %s.tutortest;' % package_name,
+                                     'package %s;' % package_name,
                                      'package %s.tutortest;\nimport %s.*;' % (package_name, package_name),
                                      '*.java')
                     minijava_exists = os.path.exists(os.path.join(new_test_dir, 'MiniJava.java'))
@@ -274,7 +288,8 @@ def command_repos():
                 if pom_xml_tpl:
                     with open(os.path.join(repo_dir, 'pom.xml'), 'w') as pom_file:
                         fs_name = package_name.replace('.', '-') + '-' + student
-                        pom_file.write(pom_xml_tpl % (package_name, fs_name, fs_name, sandbox_ver))
+                        package_path = '/'.join(package_name.split('.'))
+                        pom_file.write(pom_xml_tpl % (package_name, fs_name, fs_name, package_path, package_path, sandbox_ver))
 
     num_repos = num_students + len(special_repos)
     print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.'
