@@ -145,6 +145,7 @@ def command_repos():
     pom_xml_tpl = None
     sandbox_ver = "0.1.3"
     minijava_exists = False
+    has_test_ext = False
 
     if general['link_tests'] and course_name == 'pgdp1920':
         with open(os.path.join(script_dir, 'detail', 'pom.xml.tpl'), 'r') as tpl_file:
@@ -237,6 +238,8 @@ def command_repos():
                 if not os.path.exists(new_test_dir):
                     test_api_package = 'tum.pgdp.testapi'
 
+                    has_test_ext = os.path.exists(os.path.join(*([repo_dir, 'test', 'de', 'tum', 'in', 'test'])))
+
                     test_dir = os.path.join(*([repo_dir, 'test'] + package_name.split('.')))
                     test_api_dir = os.path.join(*([repo_dir, 'test'] + test_api_package.split('.')))
 
@@ -290,6 +293,9 @@ def command_repos():
                         fs_name = package_name.replace('.', '-') + '-' + student
                         package_path = '/'.join(package_name.split('.'))
                         pom_file.write(pom_xml_tpl % (package_name, fs_name, fs_name, package_path, package_path, sandbox_ver))
+                if has_test_ext:
+                    copytree(os.path.join(*([repo_dir, '..', 'tests', 'test', 'de', 'tum', 'in', 'test'])),
+                             os.path.join(*([repo_dir, 'src', 'de', 'tum', 'in', 'test'])))
 
     num_repos = num_students + len(special_repos)
     print('\nManaged to successfully fetch %d/%d (%.0f%%) repositories.'

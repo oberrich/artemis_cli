@@ -52,6 +52,16 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>net.jqwik</groupId>
+            <artifactId>jqwik</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>info.debatty</groupId>
+            <artifactId>java-string-similarity</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
             <groupId>de.tum.in</groupId>
             <artifactId>artemis-java-test-sandbox</artifactId>
             <version>%s</version>
